@@ -6,10 +6,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
 <style>
 /* VOICE: a working help desk; calm, exact, a little ceremonial when you earn a certificate.
-   IDEA: a ticketing workbench like Zoho Desk, with the evidence drawers of a lab bench.
+   IDEA: a ticketing workbench like Zoho Desk, with SMS client threads and lab-bench evidence drawers.
    PICTURE: the open ticket and its tool tabs, filling the first screen mid-use.
    COLOUR and TYPE: white ground, prussian band and actions, carmine for urgency and misses; Literata throughout.
-   LAYOUT: band with progress, then queue | ticket + tools | resolution; skills and certificates below. */
+   LAYOUT: band with progress, then queue | messages + tools | resolve; skills and career path below. */
 :root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
@@ -52,17 +52,28 @@ select,input[type=text],textarea{width:100%;font-size:16px;padding:9px 10px;bord
 .body{white-space:pre-wrap;font-size:17px;max-width:68ch}
 pre.con{background:var(--con);color:var(--cont);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .hintline{font-size:13px;color:var(--mute)}
-.chatlog{display:grid;gap:8px;margin-bottom:10px}
-.msg{padding:9px 12px;border-radius:8px;max-width:80%;font-size:15px;white-space:pre-wrap}
-.msg.me{justify-self:end;background:var(--pr);color:light-dark(#fff,#0f1217)}.msg.cl{background:var(--panel);border:1px solid var(--line)}
-.row{display:flex;gap:8px}.row input{flex:1}
+/* SMS thread — inbound grey, outbound Prussian; reads like a phone Messages view */
+.sms{display:flex;flex-direction:column;gap:8px;padding:14px 12px;border:1px solid var(--line);border-radius:12px;background:
+  radial-gradient(120% 80% at 0% 0%,light-dark(#e8eef5,#1a2433) 0%,transparent 55%),
+  light-dark(#eef1f5,#12161d);min-height:140px}
+.sms-head{display:flex;align-items:center;gap:10px;padding:0 2px 8px;border-bottom:1px solid light-dark(#d5dbe5,#2a3140);margin-bottom:4px}
+.sms-av{flex:none;width:36px;height:36px;border-radius:50%;background:var(--prb);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.sms-who{font-weight:600;font-size:14px;line-height:1.2}.sms-who span{display:block;font-weight:400;font-size:12px;color:var(--mute)}
+.bubble{max-width:88%;padding:9px 12px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word;animation:pop .28s ease-out}
+.bubble.in{align-self:flex-start;background:light-dark(#fff,#1e2430);border:1px solid var(--line);border-radius:16px 16px 16px 4px;color:var(--ink)}
+.bubble.out{align-self:flex-end;background:var(--pr);color:light-dark(#fff,#0f1217);border-radius:16px 16px 4px 16px}
+.bubble .meta-t{display:block;font-size:11px;opacity:.7;margin-top:4px}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sms-compose{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sms-compose textarea{min-height:110px;resize:vertical;line-height:1.45;border-radius:18px;padding:12px 14px;border:1px solid var(--line);background:var(--bg)}
+.sms-compose .sendrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sms-compose .sendrow .hintline{margin:0}
 .res{border-left:1px solid var(--line);padding:16px;background:var(--panel)}
 fieldset{border:0;padding:0;margin:0 0 16px}
 legend{font-weight:600;font-size:15px;margin-bottom:6px;padding:0}
 .opt{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;background:var(--bg);font-size:14.5px;line-height:1.4;cursor:pointer;min-height:44px}
 .opt input{margin-top:3px;flex:none;width:18px;height:18px;accent-color:var(--pr)}
 .seg{display:flex;flex-wrap:wrap;gap:5px}.seg .opt{flex:1 1 auto;margin:0;align-items:center}
-textarea{min-height:190px;resize:vertical;line-height:1.5}
 .err{color:var(--cr);font-size:14px;min-height:1em}
 .score{font-size:52px;font-weight:700;line-height:1;margin:6px 0}
 .parts{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 14px}
@@ -80,7 +91,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .empty{padding:30px 0;color:var(--mute)}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:r 1s linear infinite;vertical-align:-1px;margin-right:6px}
 @keyframes r{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+@media(prefers-reduced-motion:reduce){.spin,.bubble{animation:none}}
 @media(max-width:1180px){main{grid-template-columns:240px minmax(0,1fr)}.res{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.foot{grid-template-columns:1fr 1fr}.foot>:first-child{grid-column:1/-1}}
 /* Phone: stacked queue → tools/chat → reply; sticky progress stays clear of the reply box */
 @media(max-width:760px){
@@ -95,10 +106,10 @@ ol,ul{margin:0;padding:0;list-style:none}
   #qlist{display:flex;flex-direction:column;gap:8px;overflow:visible}
   .qitem{width:100%;margin:0}
   .tabs{gap:2px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-  .msg{max-width:100%}
-  .row{flex-wrap:wrap}.row input{flex:1 1 100%}.row .btn{flex:1 1 100%}
+  .bubble{max-width:92%}
+  .sms-compose .sendrow{flex-wrap:wrap}.sms-compose .sendrow .btn{flex:1 1 100%}
   .res{border-left:0;border-top:1px solid var(--line);padding-bottom:max(24px,env(safe-area-inset-bottom))}
-  #reply,.res h2,fieldset{scroll-margin-top:110px}
+  #reply,.res h2,fieldset,.sms{scroll-margin-top:110px}
   .foot{grid-template-columns:1fr;padding-bottom:max(24px,env(safe-area-inset-bottom))}
   .sk{grid-template-columns:minmax(0,1fr) 90px 56px}
 }
@@ -115,7 +126,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 const AREAS=['WordPress core & PHP','Plugins & WooCommerce','Performance & caching','Security & hacked sites','Divi & page builders','Shopify themes & Liquid','Shopify apps & integrations','Shopify admin & checkout','DNS, domains & email'];
 /* UK market bands (£k): title jumps at ticket thresholds; midpoint drifts with score and streak */
 const CERTS=[[10,'First line support',22,28],[50,'Experienced agent',28,35],[150,'Senior / specialist',35,45],[400,'Team lead',45,55],[1000,'Head of support',55,75]];
-const TOOLS=[['ticket','Ticket'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail'],['chat','Client chat']];
+const TOOLS=[['ticket','Messages'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail'],['notes','Client notes']];
 const PRI=['Low','Normal','High','Urgent'];
 const BILL={covered:'Covered by plan',overage:'Covered, but flag overage',adhoc:'Ad-hoc quote'};
 const CHECKS=[['read','Picked up the buried detail'],['plain','Plain, non-technical English'],['tone','Professional and proactive, no emojis'],['why','Explains the cause and why the work matters'],['next','Clear next steps and timing'],['money','Billing handled (plan, overage or £40/hr estimate)'],['safe','Safe practice (staging, backups, testing)'],['conf','Keeps the hosting provider and internals private']];
@@ -183,12 +194,11 @@ function shuf(t){for(const q of ['key','dx','fix']){const right=t[q].opts[t[q].a
 function fresh(){return{v:1,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],queue:BANK.map(t=>shuf(clone(t))),seen:[]}}
 let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
 if(!S||!Array.isArray(S.queue))S=fresh();
-let cur=S.queue[0]?.id||null,sample=null,dbRef=null,genBusy=false,genMsg='',claudeState='checking',saveChain=Promise.resolve();
+let cur=S.queue[0]?.id||null;
 const W={},DONE={};
-function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',chat:[],chatBusy:false,q:'',start:Date.now(),done:null,err:''})}
+function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',start:Date.now(),done:null,err:''})}
 function find(id){return S.queue.find(t=>t.id===id)||DONE[id]}
-function save(){try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}
-  if(dbRef){const snap=clone(S);saveChain=saveChain.then(()=>dbRef.set(snap)).catch(()=>{})}}
+function save(){try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}}
 function certFor(n){let c=null;for(const x of CERTS)if(n>=x[0])c=x;return c}
 function nextCert(n){return CERTS.find(x=>n<x[0])}
 function salaryMid(c){if(!c)return null;const lo=c[2],hi=c[3],mid=(lo+hi)/2,half=(hi-lo)/2;
@@ -202,27 +212,35 @@ function fmtT(ms){const s=Math.floor(ms/1000);return Math.floor(s/60)+'m '+Strin
 function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:0;
   const pct=nx?Math.round((n-prev)/(nx[0]-prev)*100):100;const avg=S.max?Math.round(S.sum/S.max*100):0;
   const pay=salaryMid(c);const payLine=c?`~£${pay}k · ${fmtBand(c)} UK`:(nx?`Aiming for ${fmtBand(nx)} UK`:'');
-  const st={checking:'Connecting to Claude…',on:'Claude is connected: new tickets on demand, live client chat and reply marking.',off:'Offline mode: built-in tickets with self-marking. Open this page on claude.ai for unlimited tickets.'}[claudeState];
   $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>WordPress and Shopify support tickets, worked like the real thing.</p></div>
   <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
   <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${esc(payLine)}${payLine?' · ':''}${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
-  <div class="status">${esc(st)}</div>`}
+  <div class="status">Built-in tickets with self-marking. Progress is saved in this browser.</div>`}
 
 function renderQueue(){const open=S.queue;$('#qh').textContent=`Queue · ${open.length} open`;
   $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear.</p>`;
-  const opts=['<option value="">Auto: focus on my weakest area</option>'].concat(AREAS.map(a=>`<option>${esc(a)}</option>`)).join('');
-  $('#gen').innerHTML=claudeState==='on'?`<label for="garea">Pull a new ticket</label><select id="garea">${opts}</select><button class="btn w" id="genbtn" ${genBusy?'disabled':''}>${genBusy?'<span class="spin"></span>Ticket incoming…':'Pull ticket'}</button><p class="err">${esc(genMsg)}</p>`
-  :`<p class="hintline">${claudeState==='off'?'New tickets need Claude. Open this page from its claude.ai link, then retry.':claudeState==='checking'?'<span class="spin"></span>Connecting to Claude…':''}</p>${claudeState==='off'?'<button class="btn w" id="reconnect">Retry connecting</button>':''}${open.length?'':'<button class="btn ghost w" id="replay">Replay built-in tickets</button>'}`}
+  $('#gen').innerHTML=open.length?'':`<button class="btn ghost w" id="replay">Replay built-in tickets</button>`}
 
 function opt(name,val,label,checked){return `<label class="opt"><input type="radio" name="${name}" value="${esc(val)}" ${checked?'checked':''}><span>${esc(label)}</span></label>`}
+function initials(name){return String(name||'?').split(/[\s,]+/).filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'?'}
+/* Split client email-style body into short SMS-sized bubbles */
+function smsParts(text){return String(text||'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean)}
+function smsHead(t){const who=t.from.split(',')[0];return `<div class="sms-head"><div class="sms-av" aria-hidden="true">${esc(initials(who))}</div><div class="sms-who">${esc(who)}<span>${esc(t.client)} · Text</span></div></div>`}
+function smsThread(t,x,opts){const who=t.from.split(',')[0];const parts=smsParts(t.body);
+  const inBubbles=parts.map((p,i)=>`<div class="bubble in">${esc(p)}${i===parts.length-1?`<span class="meta-t">${esc(who)}</span>`:''}</div>`).join('');
+  const has=!!x.reply.trim();
+  const draft=`<div class="bubble out"${has?'':' hidden'} data-draft><span class="draft-text">${has?esc(x.reply):''}</span><span class="meta-t">You · draft</span></div>`;
+  const notes=opts?.notes?`<div class="bubble in">${esc(t.hidden||'Nothing further from the client.')}<span class="meta-t">${esc(who)} · if asked</span></div>`:'';
+  return `<div class="sms" role="log" aria-label="Text thread with ${esc(who)}">${smsHead(t)}${inBubbles}${notes}${draft}</div>`}
 
-function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>${claudeState==='on'?'Pull a new ticket from the queue.':'Your queue is clear.'}</p></div>`;$('#res').innerHTML='';return}
+function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Your queue is clear. Replay the built-in tickets when you are ready.</p></div>`;$('#res').innerHTML='';return}
   const x=w(t.id);
-  const tabs=TOOLS.map(([k,l])=>`<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)?' seen':''}" data-tab="${k}">${l}</button>`).join('');
+  /* Map legacy 'chat' tab from older localStorage sessions onto Client notes */
+  if(x.tab==='chat')x.tab='notes';
+  const tabs=TOOLS.map(([k,l])=>`<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)||(k==='notes'&&x.tools.includes('chat'))?' seen':''}" data-tab="${k}">${l}</button>`).join('');
   let pane='';
-  if(x.tab==='ticket')pane=`<div class="body">${esc(t.body)}</div>`;
-  else if(x.tab==='chat'){pane=claudeState==='on'?`<div class="chatlog">${x.chat.map(m=>`<div class="msg ${m.r==='me'?'me':'cl'}">${esc(m.t)}</div>`).join('')||`<p class="hintline">Ask ${esc(t.from.split(',')[0])} a follow-up question. Good questions cost nothing; you get 5 per ticket.</p>`}${x.chatBusy?'<div class="msg cl"><span class="spin"></span>Typing…</div>':''}</div>
-    <form class="row" id="chatf"><input type="text" id="chatq" maxlength="300" placeholder="Your question to the client" value="${esc(x.q)}" ${x.chat.length>=10||x.done?'disabled':''}><button class="btn" ${x.chatBusy||x.chat.length>=10||x.done?'disabled':''}>Ask</button></form>`:`<p class="hintline">Client chat needs Claude. Open the page on claude.ai to use it.</p>`}
+  if(x.tab==='ticket')pane=`${smsThread(t,x)}<p class="hintline">Client texts land here. Draft your reply in Resolve — it previews in the thread.</p>`;
+  else if(x.tab==='notes')pane=`${smsThread(t,x,{notes:true})}<p class="hintline">Extra facts ${esc(t.from.split(',')[0])} would share if asked — not the diagnosis.</p>`;
   else pane=`<pre class="con">${esc(t.ev[x.tab]||'Nothing relevant.')}</pre><p class="hintline">${{site:'Front-end check: status codes, headers, console and speed.',logs:'Server, PHP and platform logs.',admin:'WordPress or Shopify admin settings, plugins and apps.',code:'Theme and config files.',dns:'DNS records and mail headers.'}[x.tab]}</p>`;
   $('#work').innerHTML=`<article class="tk"><div class="chips"><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
   <h2>${esc(t.subject)}</h2>
@@ -232,14 +250,19 @@ function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class=
 
 function renderRes(t,x){
   if(x.done){renderReview(t,x);return}
+  const who=t.from.split(',')[0];
   $('#res').innerHTML=`<h2>Resolve this ticket</h2>
   <fieldset><legend>1. Which detail in the ticket matters most?</legend>${t.key.opts.map((o,i)=>opt('key',i,o,x.key===i)).join('')}</fieldset>
   <fieldset><legend>2. Priority</legend><div class="seg">${PRI.map(p=>opt('pri',p,p,x.pri===p)).join('')}</div></fieldset>
   <fieldset><legend>3. Billing</legend>${Object.entries(BILL).map(([k,l])=>opt('bill',k,l,x.bill===k)).join('')}</fieldset>
   <fieldset><legend>4. Most likely cause</legend>${t.dx.opts.map((o,i)=>opt('dx',i,o,x.dx===i)).join('')}</fieldset>
   <fieldset><legend>5. First fix</legend>${t.fix.opts.map((o,i)=>opt('fix',i,o,x.fix===i)).join('')}</fieldset>
-  <fieldset><legend>6. Reply to ${esc(t.from.split(',')[0])}</legend><textarea id="reply" placeholder="Write the reply you'd send from the help desk.">${esc(x.reply)}</textarea></fieldset>
-  <p class="err">${esc(x.err)}</p><button class="btn w" id="submit">Submit and resolve</button>`}
+  <fieldset><legend>6. Text ${esc(who)} back</legend>
+  ${smsThread(t,x)}
+  <div class="sms-compose"><label class="hintline" for="reply">Your reply (as you'd send from the desk)</label>
+  <textarea id="reply" maxlength="4000" placeholder="Hi ${esc(who)}, …">${esc(x.reply)}</textarea>
+  <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div></div></fieldset>
+  <p class="err">${esc(x.err)}</p><button class="btn w" id="submit">Send and resolve</button>`}
 
 function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));const kt=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;
   return[['Spotted the key detail',x.key===t.key.a?3:0,3,x.key===t.key.a?'':'Key detail: '+t.key.opts[t.key.a]],
@@ -250,21 +273,18 @@ function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));cons
 
 function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.reduce((a,p)=>a+p[1],0);const tot=base+(rp??0);
   let replyBlock='';
-  if(x.done.state==='grading')replyBlock=`<p><span class="spin"></span>Claude is marking your reply…</p>`;
-  else if(x.done.state==='self')replyBlock=`<p class="note">Compare your reply with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w" id="selfok">Confirm reply score</button>`;
-  else{const fb=x.done.fb;replyBlock=fb?`<table class="parts">${CHECKS.map(([k,l])=>`<tr><td>${esc(l)}</td><td class="${fb.checks?.[k]?'hit':'miss'}">${fb.checks?.[k]?'Yes':'Missed'}</td></tr>`).join('')}</table>
-    ${fb.good?.length?`<p class="note"><b>What worked:</b> ${fb.good.map(esc).join(' ')}</p>`:''}${fb.fix?.length?`<p class="note"><b>Improve:</b> ${fb.fix.map(esc).join(' ')}</p>`:''}`:''}
+  if(x.done.state==='self')replyBlock=`<p class="note">Compare your text with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w" id="selfok">Confirm reply score</button>`;
   $('#res').innerHTML=`<h2>Ticket resolved</h2><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
   <table class="parts">${P.map(p=>`<tr><td>${esc(p[0])}${p[1]<p[2]?`<div class="miss note">${esc(p[3])}</div>`:''}</td><td class="${p[1]===p[2]?'hit':'miss'}">${p[1]}/${p[2]}</td></tr>`).join('')}<tr><td>Client reply</td><td>${rp==null?'…':rp+'/8'}</td></tr></table>
   ${replyBlock}
+  <div class="sms" style="margin-top:12px">${smsHead(t)}${smsParts(t.body).map(p=>`<div class="bubble in">${esc(p)}</div>`).join('')}${x.reply.trim()?`<div class="bubble out">${esc(x.reply)}<span class="meta-t">You · sent</span></div>`:''}</div>
   <details ${x.done.state==='self'?'open':''}><summary>Model reply</summary><p class="body" style="font-size:15px">${esc(t.model)}</p></details>
-  ${x.done.fb?.rewrite?`<details><summary>Your reply, improved</summary><p class="body" style="font-size:15px">${esc(x.done.fb.rewrite)}</p></details>`:''}
   <p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>${/^https:\/\//.test(t.url||'')?`<p class="note"><a href="${esc(t.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}
-  ${x.done.state==='final'?`<button class="btn w" id="next">${S.queue.length?'Next ticket':claudeState==='on'?'Pull the next ticket':'Finish'}</button>`:''}`}
+  ${x.done.state==='final'?`<button class="btn w" id="next">${S.queue.length?'Next ticket':'Finish'}</button>`:''}`}
 
 function renderFoot(){const wk=weakest();
   const sk=AREAS.map(a=>{const r=S.areas[a],p=areaPct(a);return `<div class="sk"><span>${esc(a)}</span><div class="bar"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><b>${p==null?'–':Math.round(p*100)+'%'}</b></div>`}).join('');
-  $('#foot').innerHTML=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Auto tickets target this area.</p></div>
+  $('#foot').innerHTML=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Replay tickets to practise weak areas.</p></div>
   <div><h2>Career path · UK salary</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])} · ${fmtBand(c)}</span><span>${c[0]} tickets</span></li>`).join('')}</ol><p class="hintline">Title jumps at ticket thresholds; the £ midpoint drifts with average score and streak.</p></div>
   <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`}
 
@@ -276,89 +296,29 @@ function commit(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.repl
   S.hist.unshift({s:t.subject,a:t.area,g:tot,at:Date.now()});S.hist=S.hist.slice(0,60);
   S.seen.push(t.subject);S.seen=S.seen.slice(-40);DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);x.done.state='final';save()}
 
-async function ask(prompt,tier){const r=await sample(prompt,{modelTier:tier||'default'});return r.text||''}
-function parseJSON(s){const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a<0||b<a)throw new Error('no json');return JSON.parse(s.slice(a,b+1))}
-
-async function grade(t,x){
-  const prompt=`You are a senior support lead marking a junior web developer's reply to a client support ticket. Be fair, specific and brief. UK English.
-TICKET (${t.desk}, ${t.p}) from ${t.from} at ${t.client}. Plan: ${t.plan}.
-${t.body}
-HIDDEN TRUTH: key detail = "${t.key.opts[t.key.a]}"; cause = "${t.dx.opts[t.dx.a]}"; correct first fix = "${t.fix.opts[t.fix.a]}"; billing = "${BILL[t.bill]}" (ad-hoc rate £40/hr, not VAT registered).
-MODEL REPLY:
-${t.model}
-CANDIDATE REPLY:
-${x.reply}
-Mark against these 8 checks (true/false each): read (addresses the buried key detail), plain (non-technical, client-friendly), tone (professional, proactive, no emojis), why (explains the cause and justifies the work), next (clear next steps and timing), money (handles billing correctly: covered by plan, flags overage with cost, or gives an ad-hoc estimate at £40/hr), safe (mentions safe practice such as staging, backups or testing where relevant), conf (does not name the hosting provider, staff, server hostnames or raw tickets; "our managed server team" is fine).
-Return ONLY JSON: {"checks":{"read":bool,"plain":bool,"tone":bool,"why":bool,"next":bool,"money":bool,"safe":bool,"conf":bool},"good":["one short sentence"],"fix":["up to two short sentences"],"rewrite":"an improved version of the candidate's reply, keeping their voice"}`;
-  try{const j=parseJSON(await ask(prompt,'default'));const ch=j.checks||{};
-    x.done.fb={checks:ch,good:(j.good||[]).slice(0,2).map(String),fix:(j.fix||[]).slice(0,3).map(String),rewrite:String(j.rewrite||'')};
-    x.done.reply=CHECKS.filter(([k])=>ch[k]===true).length;commit(t,x)}
-  catch(e){x.done.state='self'}
-  if(cur===t.id)render()}
-
-function validTicket(j){const ok3=q=>q&&Array.isArray(q.opts)&&q.opts.length===4&&Number.isInteger(q.a)&&q.a>=0&&q.a<4;
-  return j&&typeof j.subject==='string'&&typeof j.body==='string'&&ok3(j.key)&&ok3(j.dx)&&ok3(j.fix)&&j.ev&&PRI.includes(j.pri)&&BILL[j.bill]&&['site','logs','admin','code','dns'].includes(j.keyTool)&&typeof j.model==='string'}
-
-async function gen(areaPick){if(genBusy||!sample)return;genBusy=true;genMsg='';renderQueue();
-  const area=areaPick||weakest();const n=S.resolved;
-  const diff=n<10?'straightforward: one clear key detail, mild distractors':n<50?'moderate: include one red herring in the evidence':'hard: the client states a wrong assumption, and the evidence contains a red herring';
-  const desk=Math.random()<.5?'Agency desk (school, charity or SME on a support retainer; refer to "our managed server team", never a hosting brand)':'Freelance (small UK business; care plan with hours or ad-hoc at £40/hr)';
-  const ex=clone(BANK[0]);delete ex.id;
-  const prompt=`Write ONE realistic support ticket for a training simulator for a UK WordPress (Divi, ACF, Gravity Forms, WooCommerce, Yoast) and Shopify (Liquid, OS 2.0, apps, Markets, Klaviyo) developer.
-Area: ${area}. Platform must fit the area. Desk: ${desk}. Difficulty: ${diff}.
-Rules: invent the client business and contact (UK). The client writes like a real non-technical person. Bury the most important clue inside ordinary detail. Evidence in ev.site/logs/admin/code/dns must look like real tool output (headers, log lines, settings, code, DNS records); 1-3 of them relevant, the rest "Nothing relevant." or a mild red herring. keyTool is the ev key holding the decisive evidence. All four options in key, dx and fix must be plausible; a is the index of the correct one. pri is one of Low, Normal, High, Urgent. bill is covered, overage or adhoc, consistent with the plan's hours. hidden = facts the client knows if asked (not the diagnosis). model = an excellent reply from Alex: plain English, explains cause and value, next steps, timing, billing handled, staging/testing where relevant, no emojis, never names a hosting provider. learn = one or two sentence takeaway. url = a real https documentation page (developer.wordpress.org, wordpress.org, woocommerce.com, shopify.dev, help.shopify.com or the plugin's own docs).
-Avoid repeating these recent subjects: ${S.seen.slice(-20).join(' | ')||'none'}.
-Return ONLY JSON with exactly these keys, same shape as this example:
-${JSON.stringify(ex)}`;
-  try{const j=parseJSON(await ask(prompt,'default'));if(!validTicket(j))throw new Error('shape');
-    const t=shuf({id:'g'+Date.now(),desk:String(j.desk||'Freelance'),p:String(j.p||''),area:AREAS.includes(j.area)?j.area:area,client:String(j.client||''),from:String(j.from||'Client'),subject:j.subject,plan:String(j.plan||''),site:String(j.site||''),pri:j.pri,bill:j.bill,body:j.body,
-      key:j.key,ev:{site:String(j.ev.site||''),logs:String(j.ev.logs||''),admin:String(j.ev.admin||''),code:String(j.ev.code||''),dns:String(j.ev.dns||'')},keyTool:j.keyTool,
-      dx:{...j.dx,why:String(j.dx.why||'')},fix:{...j.fix,why:String(j.fix.why||'')},hidden:String(j.hidden||''),model:j.model,learn:String(j.learn||''),url:String(j.url||'')});
-    t.key.opts=t.key.opts.map(String);t.dx.opts=t.dx.opts.map(String);t.fix.opts=t.fix.opts.map(String);
-    S.queue.push(t);if(!find(cur)||DONE[cur])cur=t.id;save()}
-  catch(e){genMsg=e&&e.code==='rate_limited'?'Claude is busy. Try again in a minute.':e&&e.code==='not_granted'?'Claude access was declined for this page.':'That ticket came out malformed. Try again.';if(e&&e.code==='not_granted'){claudeState='off'}}
-  genBusy=false;render()}
-
-async function chat(t,x){const q=x.q.trim();if(!q||x.chatBusy)return;x.chat.push({r:'me',t:q});x.q='';x.chatBusy=true;renderWork();
-  const hist=x.chat.map(m=>(m.r==='me'?'Developer: ':'You: ')+m.t).join('\n');
-  const prompt=`Role-play ${t.from} at ${t.client}, a non-technical UK client who raised this support ticket:
-${t.body}
-Things you know if asked: ${t.hidden}
-Stay in character. Answer only what you'd plausibly know, in 1-3 short sentences. Never state the technical cause or the fix. If asked something you don't know, say so naturally.
-Conversation:
-${hist}
-Reply as the client only, no name prefix.`;
-  try{x.chat.push({r:'cl',t:(await ask(prompt,'quick')).trim()})}catch(e){x.chat.push({r:'cl',t:'(The client didn\'t reply. Try again shortly.)'})}
-  x.chatBusy=false;if(cur===t.id)renderWork()}
-
 document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
   if(el.dataset.open){cur=el.dataset.open;w(cur);render();if(innerWidth<1180)$('#work').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});return}
   const t=find(cur),x=t&&w(t.id);
   if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);renderWork();return}
-  if(el.id==='genbtn'){gen($('#garea').value);return}
   if(el.id==='replay'){S.queue=BANK.map(b=>shuf(clone(b)));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;save();render();return}
   if(el.id==='submit'&&t){x.reply=$('#reply').value;
     if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);return}
     if(x.reply.trim().length<60){x.err='Write a fuller reply to the client.';renderRes(t,x);return}
-    x.err='';x.done={parts:parts(t,x),reply:null,fb:null,state:sample&&claudeState==='on'?'grading':'self',at:Date.now()};render();if(x.done.state==='grading')grade(t,x);return}
+    x.err='';x.done={parts:parts(t,x),reply:null,fb:null,state:'self',at:Date.now()};render();return}
   if(el.id==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;commit(t,x);render();return}
-  if(el.id==='next'){if(S.queue.length){cur=S.queue[0].id;render();if(S.queue.length<3&&claudeState==='on')gen()}else if(claudeState==='on'){cur=null;render();gen()}else{cur=null;render()}}
+  if(el.id==='next'){if(S.queue.length){cur=S.queue[0].id;render()}else{cur=null;render()}}
 });
 document.addEventListener('change',e=>{const t=find(cur);if(!t)return;const x=w(t.id),n=e.target.name,v=e.target.value;
   if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
-document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value});
-document.addEventListener('submit',e=>{if(e.target.id!=='chatf')return;e.preventDefault();const t=find(cur);if(t)chat(t,w(t.id))});
+document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id!=='reply')return;
+  x.reply=e.target.value;const text=x.reply.trim();
+  /* Live-update draft bubbles in Messages and Resolve without resetting triage */
+  document.querySelectorAll('.sms [data-draft]').forEach(b=>{
+    b.hidden=!text;const dt=b.querySelector('.draft-text');if(dt)dt.textContent=text?x.reply:'';
+  });
+});
 const tick=setInterval(()=>{const el=$('#timer'),t=find(cur);if(el&&t&&W[t.id]&&!W[t.id].done)el.textContent=fmtT(Date.now()-W[t.id].start)},1000);
 
 render();
-async function connect(){claudeState='checking';render();let C=null;
-  for(let i=0;i<60&&!(C=window.claude)?.use;i++)await new Promise(r=>setTimeout(r,250));
-  if(!C||!C.use){claudeState='off';render();return null}
-  try{sample=await C.use('sample')}catch(e){sample=null}claudeState=sample?'on':'off';render();return C}
-document.addEventListener('click',e=>{if(e.target.closest('#reconnect'))connect()});
-(async()=>{const C=await connect();if(!C)return;
-  try{const db=await C.use('db'),u=await C.use('user');if(db&&u){const id=await u.id();if(id){dbRef=db.doc('data/users/'+id+'/progress');
-    const snap=await dbRef.get();if(snap.exists){const d=snap.data();if(d&&Array.isArray(d.queue)&&(d.resolved||0)>=(S.resolved||0)){S=clone(d);if(!find(cur))cur=S.queue[0]?.id||null;try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}render()}else save()}
-    else if(S.resolved)save()}}}catch(e){dbRef=null}})();
 }
 </script></body></html>
