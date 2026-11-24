@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Service Desk Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a working help desk; calm, exact, a little ceremonial when you earn a certificate.
+   IDEA: a ticketing workbench like Zoho Desk, with the evidence drawers of a lab bench.
+   PICTURE: the open ticket and its tool tabs, filling the first screen mid-use.
+   COLOUR and TYPE: white ground, prussian band and actions, carmine for urgency and misses; Literata throughout.
+   LAYOUT: band with progress, then queue | ticket + tools | resolution; skills and certificates below. */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Literata,Georgia,serif;overflow-x:clip}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--pr);outline-offset:2px}
+.band{padding:clamp(18px,3vw,36px) max(4vw,16px)}
+header.band{background:var(--prb);color:#fff;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:end;justify-content:space-between}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0;font-weight:700;text-wrap:balance}
+header p{margin:6px 0 0;opacity:.85;font-size:15px}
+.stats{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:end}
+.stat b{display:block;font-size:26px;line-height:1.1;white-space:nowrap}.stat span{font-size:13px;opacity:.85}
+.cert{min-width:220px}.meter{height:8px;background:rgba(255,255,255,.22);border-radius:4px;overflow:hidden;margin-top:6px}.meter i{display:block;height:100%;background:#fff}
+.status{font-size:13px;opacity:.9;width:100%}
+main{display:grid;grid-template-columns:270px minmax(0,1fr) 360px;gap:0;border-bottom:1px solid var(--line);max-width:1600px;margin:0 auto}
+.queue{border-right:1px solid var(--line);padding:16px;background:var(--panel)}
+.queue h2,.res h2,.foot h2{font-size:17px;margin:0 0 10px}
+.qitem{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;min-height:44px}
+.qitem.on{border-color:var(--pr);box-shadow:inset 3px 0 0 var(--pr)}
+.qitem .s{font-weight:600;font-size:15px;line-height:1.3;display:block}
+.qitem .m{font-size:13px;color:var(--mute);display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.pri-Urgent,.pri-High{color:var(--cr);font-weight:600}
+.gen{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.gen label{font-size:13px;color:var(--mute);display:block;margin-bottom:4px}
+select,input[type=text],textarea{width:100%;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border-radius:6px;border:1px solid var(--pr);background:var(--pr);color:light-dark(#fff,#0f1217);font-weight:600}
+.btn.ghost{background:transparent;color:var(--pr)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.w{width:100%;margin-top:8px}
+.work{padding:18px clamp(14px,2vw,26px)}
+.tk h2{font-size:clamp(24px,2.6vw,32px);line-height:1.1;margin:4px 0 12px;text-wrap:balance}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:13px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;white-space:nowrap}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 18px;font-size:14px;padding:12px 0;border-block:1px solid var(--line);margin-bottom:12px}
+.meta span{color:var(--mute);display:block;font-size:13px}
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:14px}
+.tab{flex:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;min-height:44px;color:var(--mute);font-weight:600}
+.tab.on{color:var(--ink);border-color:var(--pr)}.tab.seen:not(.on)::after{content:" ·";color:var(--pr)}
+.body{white-space:pre-wrap;font-size:17px;max-width:68ch}
+pre.con{background:var(--con);color:var(--cont);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.hintline{font-size:13px;color:var(--mute)}
+.chatlog{display:grid;gap:8px;margin-bottom:10px}
+.msg{padding:9px 12px;border-radius:8px;max-width:80%;font-size:15px;white-space:pre-wrap}
+.msg.me{justify-self:end;background:var(--pr);color:light-dark(#fff,#0f1217)}.msg.cl{background:var(--panel);border:1px solid var(--line)}
+.row{display:flex;gap:8px}.row input{flex:1}
+.res{border-left:1px solid var(--line);padding:16px;background:var(--panel)}
+fieldset{border:0;padding:0;margin:0 0 16px}
+legend{font-weight:600;font-size:15px;margin-bottom:6px;padding:0}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;background:var(--bg);font-size:14.5px;line-height:1.4;cursor:pointer;min-height:44px}
+.opt input{margin-top:3px;flex:none;width:18px;height:18px;accent-color:var(--pr)}
+.seg{display:flex;flex-wrap:wrap;gap:5px}.seg .opt{flex:1 1 auto;margin:0;align-items:center}
+textarea{min-height:190px;resize:vertical;line-height:1.5}
+.err{color:var(--cr);font-size:14px;min-height:1em}
+.score{font-size:52px;font-weight:700;line-height:1;margin:6px 0}
+.parts{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 14px}
+.parts td{padding:6px 0;border-bottom:1px solid var(--line);vertical-align:top}.parts td:last-child{text-align:right;white-space:nowrap;padding-left:8px}
+.miss{color:var(--cr)}.hit{color:var(--ok)}
+.note{font-size:14px;margin:4px 0 10px}
+details{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:8px 0;background:var(--bg)}summary{cursor:pointer;font-weight:600;min-height:28px}
+.foot{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:28px;max-width:1600px;margin:0 auto}
+.sk{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 64px;gap:8px;align-items:center;font-size:14px;margin-bottom:6px}
+.bar{height:10px;background:var(--panel);border:1px solid var(--line);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pr)}
+.sk b{text-align:right;font-weight:600;white-space:nowrap}
+.certs li{padding:5px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;font-size:14px}.certs li.got{font-weight:700;color:var(--pr)}
+ol,ul{margin:0;padding:0;list-style:none}
+.hist li{font-size:14px;padding:5px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}
+.empty{padding:30px 0;color:var(--mute)}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:r 1s linear infinite;vertical-align:-1px;margin-right:6px}
+@keyframes r{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.spin{animation:none}}
+@media(max-width:1180px){main{grid-template-columns:240px minmax(0,1fr)}.res{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.foot{grid-template-columns:1fr 1fr}.foot>:first-child{grid-column:1/-1}}
+@media(max-width:760px){main{grid-template-columns:1fr}.queue{border-right:0;border-bottom:1px solid var(--line)}#qlist{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory}.qitem{flex:0 0 78%;scroll-snap-align:start;margin:0}.foot{grid-template-columns:1fr}.sk{grid-template-columns:minmax(0,1fr) 90px 56px}}
+</style></head><body>
+<header class="band" id="hdr"></header>
+<main>
+  <section class="queue" aria-label="Ticket queue"><h2 id="qh">Queue</h2><div id="qlist"></div><div class="gen" id="gen"></div></section>
+  <section class="work" id="work" aria-label="Ticket"></section>
+  <aside class="res" id="res" aria-label="Resolution"></aside>
+</main>
+<section class="band foot" id="foot"></section>
+<script>
+{
+const AREAS=['WordPress core & PHP','Plugins & WooCommerce','Performance & caching','Security & hacked sites','Divi & page builders','Shopify themes & Liquid','Shopify apps & integrations','Shopify admin & checkout','DNS, domains & email'];
+const CERTS=[[10,'First line support'],[25,'Support technician'],[50,'Second line support'],[100,'Senior support engineer'],[250,'Third line developer'],[500,'Support team lead'],[1000,'Head of support']];
+const TOOLS=[['ticket','Ticket'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail'],['chat','Client chat']];
+const PRI=['Low','Normal','High','Urgent'];
+const BILL={covered:'Covered by plan',overage:'Covered, but flag overage',adhoc:'Ad-hoc quote'};
+const CHECKS=[['read','Picked up the buried detail'],['plain','Plain, non-technical English'],['tone','Professional and proactive, no emojis'],['why','Explains the cause and why the work matters'],['next','Clear next steps and timing'],['money','Billing handled (plan, overage or £40/hr estimate)'],['safe','Safe practice (staging, backups, testing)'],['conf','Keeps the hosting provider and internals private']];
+const BANK=[
+{id:'b1',desk:'Agency desk',p:'WordPress',area:'Performance & caching',client:'Hollybrook Primary School',from:'Joanne Price, Office Manager',subject:'Term dates not updating on the homepage',plan:'Support retainer · 3 hrs/month · 0.5 used',site:'hollybrookprimary.sch.uk · WordPress 6.8 · Divi',pri:'High',bill:'covered',
+body:"Hi,\n\nI updated the spring term dates on the homepage this morning and pressed Update. When I look at the site it still shows the old dates. Weirdly my colleague Sarah says she can see the new ones on her laptop, but she's logged in too as she's doing the newsletter.\n\nParents keep ringing the office about it so if you could look today that would be great.\n\nThanks,\nJoanne",
+key:{opts:["Sarah sees the new dates while she's logged in","The site is built with Divi","Parents keep ringing the office","Joanne pressed Update this morning"],a:0},
+ev:{site:"GET / (logged out) → 200 OK\nx-litespeed-cache: hit\nage: 31842\nOld term dates shown\n\nGET / (logged in) → 200 OK\nx-litespeed-cache: miss\nNew term dates shown",logs:"No PHP errors in the last 24 hours.",admin:"LiteSpeed Cache 6.5 (active)\n  Public cache TTL: 604800 seconds\n  Purge all on page update: OFF\nDivi 4.27 · Static CSS file generation: on",code:".htaccess contains the standard LiteSpeed block. Nothing custom.",dns:"A record → our managed server. Nothing unusual."},keyTool:'site',
+dx:{opts:["The page cache is serving an old stored copy to logged-out visitors","Divi didn't save the change","DNS still points at an old server","Sarah's laptop has a newer Divi version"],a:0,why:"Logged-in users skip the page cache, so they see the fresh page. Logged-out visitors get a cache hit that is about 9 hours old, and purge-on-update is switched off."},
+fix:{opts:["Purge the homepage cache, switch on purge-on-update for pages, then check in a private window","Republish the page from the Divi builder","Ask Joanne to clear her browser cookies","Turn LiteSpeed Cache off for good"],a:0,why:"Purging fixes today; purge-on-update stops it recurring. Turning caching off would slow the site for every parent."},
+hidden:"Joanne is not technical. She saved the change at about 9:40am. She checks the site logged out on her office PC. Nobody has changed plugins recently.",
+model:"Hi Joanne,\n\nThanks for flagging this. The new term dates are saved correctly; the issue was that the website keeps a stored copy of each page so it loads quickly for parents, and that copy hadn't refreshed after your update. Logged-in staff like Sarah skip the stored copy, which is why she could see the change.\n\nI've cleared the stored copy of the homepage and checked it as a parent would see it, and the new dates are now showing. I've also switched on a setting so the stored copy refreshes automatically whenever a page is updated, so this shouldn't happen again.\n\nThis was covered by your support plan. If you spot anything else, just reply here or raise it through the Help Centre.\n\nKind regards,\nAlex",
+learn:"\"I can see it but others can't\" is almost always caching. Check response headers (x-litespeed-cache, cf-cache-status, age) before you touch the page.",url:"https://docs.litespeedtech.com/lscache/lscwp/cache/"},
+{id:'b2',desk:'Freelance',p:'WordPress',area:'Plugins & WooCommerce',client:'Fenwick & Fold Stationery',from:'Priya Shah, Owner',subject:'Orders stuck on "Pending payment"',plan:'Care plan · 1 hr/month · 0.75 used · ad-hoc £40/hr',site:'fenwickandfold.co.uk · WooCommerce 9 · Stripe',pri:'Urgent',bill:'overage',
+body:"Hi Alex,\n\nSince Tuesday every order is coming through as Pending payment even though customers are being charged. I can see the money in Stripe. I've been changing them to Processing by hand which is a pain.\n\nNot sure if it's related but our marketing guy said we should drop the www, so we switched the domain over to fenwickandfold.co.uk on Monday night.\n\nCan you have a look? Our Black Friday sale starts this week!\n\nPriya",
+key:{opts:["The domain changed from www to non-www on Monday","The Black Friday sale starts this week","The money is reaching Stripe","Priya is updating orders by hand"],a:0},
+ev:{site:"GET https://www.fenwickandfold.co.uk/?wc-api=wc_stripe\n→ 301 Moved Permanently\n→ https://fenwickandfold.co.uk/?wc-api=wc_stripe",logs:"WooCommerce › Status › Logs (stripe)\n  No webhook events received since Mon 23:12\n\nStripe dashboard › Webhooks\n  Endpoint: https://www.fenwickandfold.co.uk/?wc-api=wc_stripe\n  214 failed deliveries (HTTP 301)",admin:"WooCommerce › Payments › Stripe\n  Webhook URL to use: https://fenwickandfold.co.uk/?wc-api=wc_stripe\nSettings › General\n  Site Address: https://fenwickandfold.co.uk",code:"Nothing payment-related in functions.php.",dns:"www CNAME → fenwickandfold.co.uk\nRedirect rule: www → apex (301)"},keyTool:'logs',
+dx:{opts:["Stripe is still sending payment confirmations to the old www address, and the redirect makes them fail","Stripe has suspended the account","WooCommerce needs an update","Customers are abandoning checkout"],a:0,why:"WooCommerce marks an order paid when Stripe's webhook arrives. Webhooks don't follow redirects, so every one since the domain switch has failed."},
+fix:{opts:["Update the webhook endpoint in Stripe, resend the failed events, and confirm orders move to Processing","Reinstall the Stripe plugin","Switch the domain back to www","Bulk-mark every pending order as Processing"],a:0,why:"Resending failed events lets WooCommerce reconcile the stuck orders properly instead of guessing which were paid."},
+hidden:"Priya changed the domain on Monday night with her marketing contact. Around 30 orders are affected. She isn't sure who set up Stripe originally but has the login.",
+model:"Hi Priya,\n\nThanks for the detail about the domain change, that was the key. When a customer pays, Stripe sends a confirmation message back to your website, and that's what moves the order to Processing. Stripe was still sending those messages to the old www address, and since Monday they've been bouncing off the redirect, so your site never heard the payment had gone through.\n\nThe fix is to point Stripe at the new address, resend the missed confirmations so the stuck orders update themselves, and then place a test order to prove it's working before your sale. I'd estimate about an hour. You have 15 minutes left on this month's care plan, so the remaining 45 minutes would be billed at £40/hr (£30). If you're happy with that, reply here and I'll get it done today.\n\nUntil then, please don't bulk-change the pending orders, as resending the confirmations will sort them correctly.\n\nBest,\nAlex",
+learn:"Payment gateways confirm orders by webhook. A domain, SSL or redirect change can break them silently, so check the gateway's webhook delivery log first.",url:"https://docs.stripe.com/webhooks"},
+{id:'b3',desk:'Agency desk',p:'WordPress',area:'WordPress core & PHP',client:'Marlowe Community Trust',from:'Daniel Okafor, Comms Officer',subject:'"There has been a critical error on this website"',plan:'Support retainer · 4 hrs/month · 1 used',site:'marlowetrust.org.uk · WordPress 6.8',pri:'Urgent',bill:'covered',
+body:"Morning,\n\nOur website is just showing 'There has been a critical error on this website' this morning. Nobody here has touched it since last week.\n\nWe did get an email on Friday from your server team saying PHP was being upgraded to 8.3 over the weekend, which I assume was fine?\n\nCould you look urgently? We've got a donation appeal going out at 2pm.\n\nDaniel",
+key:{opts:["PHP was upgraded to 8.3 over the weekend","Nobody has touched the site since last week","A donation appeal goes out at 2pm","It's a charity site"],a:0},
+ev:{site:"GET / → 500 Internal Server Error\nBody: There has been a critical error on this website.",logs:"PHP Fatal error: Uncaught Error: Call to undefined function create_function()\n  in /wp-content/plugins/event-rotator-lite/rotator.php:88",admin:"Recovery mode email sent to admin@marlowetrust.org.uk (Sat 03:02)\nPlugin: Event Rotator Lite 1.2, last updated 2017",code:"wp-config.php: WP_DEBUG false. No must-use plugins.",dns:"Nothing unusual."},keyTool:'logs',
+dx:{opts:["An abandoned plugin uses a function removed in PHP 8, so it crashes the site","WordPress core files are corrupted","The server has run out of disk space","The theme licence has expired"],a:0,why:"create_function() was removed in PHP 8. The log names the exact plugin and line."},
+fix:{opts:["Deactivate the plugin (recovery mode or rename its folder), confirm the site loads, then replace it with a maintained alternative tested on staging","Ask the server team to roll back to PHP 7.4 for good","Reinstall WordPress core","Restore last week's backup over the live site"],a:0,why:"Getting the site up takes minutes; the replacement is done properly on staging. Rolling PHP back leaves the site on an unsupported version."},
+hidden:"The rotator plugin shows upcoming events on the homepage and they want to keep that feature. Daniel never saw the recovery mode email.",
+model:"Hi Daniel,\n\nThe site is back up. The cause was an old add-on that shows your upcoming events on the homepage. It hasn't been updated since 2017 and isn't compatible with the newer, more secure server software installed at the weekend, so it stopped the whole site loading.\n\nI've switched that add-on off so you're safe for the 2pm appeal. The events strip will be missing from the homepage for now. Next, I'll set up a maintained replacement on our staging copy, check it with you, and then put it live, which I expect to take around an hour within your support plan.\n\nI'll update you here once the staging version is ready to review.\n\nKind regards,\nAlex",
+learn:"\"Critical error\" after a PHP change: read the PHP error log for the plugin path. create_function(), each() and similar were removed in PHP 8.",url:"https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/"},
+{id:'b4',desk:'Freelance',p:'Shopify',area:'Shopify apps & integrations',client:'Kestrel Outdoor',from:'Tom Reid, Ecommerce Lead',subject:'Old popup still showing after removing the app',plan:'Ad-hoc · £40/hr',site:'kestreloutdoor.co.uk · Shopify · Dawn 15 (customised)',pri:'Normal',bill:'adhoc',
+body:"Hi Alex,\n\nWe uninstalled the Spinwheel discount app on Friday as we've moved to Klaviyo forms. The old wheel popup is still showing on the homepage, but only on our live theme. On the new theme I'm drafting for January it doesn't show at all.\n\nIt's slowing the page down too. PageSpeed flagged a script from spinwheel-cdn.\n\nCan you remove it? How long will it take?\n\nTom",
+key:{opts:["It shows on the live theme but not the draft theme","They've moved to Klaviyo forms","The app was uninstalled on Friday","PageSpeed flagged a script"],a:0},
+ev:{site:"Console: GET https://spinwheel-cdn.example/wheel.js 200 (from theme.liquid)\nLighthouse: Reduce unused JavaScript, wheel.js 182 KB",logs:"Apps › Uninstalled: Spinwheel Discounts (Fri)\nScript tags via Admin API: none remaining",admin:"Themes: 'Kestrel Live' (published, last edited 2022)\n        'January redesign' (draft, fresh Dawn install)",code:"layout/theme.liquid, line 214:\n{% render 'spinwheel-loader' %}\n<script src=\"https://spinwheel-cdn.example/wheel.js\" defer><\/script>\n\nsnippets/spinwheel-loader.liquid exists",dns:"Nothing relevant."},keyTool:'code',
+dx:{opts:["The app's code was pasted into the live theme files, so uninstalling the app didn't remove it","Shopify is caching the old app","Klaviyo is loading the wheel","The app wasn't fully uninstalled"],a:0,why:"The draft theme is a fresh install without the pasted code, which is why it's clean. Older apps edited theme files directly."},
+fix:{opts:["Duplicate the live theme, remove the render tag, script and snippet, preview, then publish","Reinstall the app and uninstall it again","Delete the lines straight from the live theme","Turn off Klaviyo forms"],a:0,why:"Working on a duplicate means nothing breaks for shoppers while you test."},
+hidden:"Tom wants it gone before Thursday's newsletter. The live theme was set up by a previous agency. He'd like a fixed price if possible.",
+model:"Hi Tom,\n\nThe popup is still there because the app's code was added directly into your live theme's files when it was installed, and uninstalling the app doesn't clean that up. Your January theme is a fresh copy, which is why it's not affected.\n\nI'll make a copy of the live theme, remove the leftover code there, check the homepage and run PageSpeed again, then publish it so nothing breaks for shoppers in the meantime. I'll also check for any other leftovers from the previous agency while I'm in there.\n\nThis should take about 45 minutes, so £30 at my £40/hr rate. I can have it done before Thursday's newsletter if you're happy to go ahead.\n\nBest,\nAlex",
+learn:"Older apps injected code into theme files and uninstalling doesn't remove it. Modern apps use theme app extensions. Search the theme code for leftovers and work on a duplicate.",url:"https://shopify.dev/docs/apps/build/online-store/theme-app-extensions"},
+{id:'b5',desk:'Agency desk',p:'Shopify',area:'Shopify admin & checkout',client:'Bramble & Bee',from:'Lucy Hart, Founder',subject:'Discount code not working for some customers',plan:'Support retainer · 2 hrs/month · 0.5 used',site:'brambleandbee.com · Shopify',pri:'High',bill:'covered',
+body:"Hello,\n\nWe sent the WINTER15 code out in our newsletter yesterday. It works when I test it, but we've had about ten emails from customers saying the code can't be used.\n\nLooking at their screenshots, they all seem to have something from the Sale collection in their basket, if that helps. We also have the 'Sale 20% off' automatic discount running this week.\n\nThanks,\nLucy",
+key:{opts:["Customers with Sale items are also getting the automatic 20% discount","Lucy tested it and it worked","About ten customers emailed","The code went out in yesterday's newsletter"],a:0},
+ev:{site:"Test checkout: Sale item + WINTER15\n→ \"This discount code couldn't be used with your existing discounts\"",logs:"Nothing relevant.",admin:"Discounts › WINTER15: 15% off order · Combinations: none\nDiscounts › Sale 20% off (automatic): product discount, Sale collection · Combinations: none",code:"Nothing relevant. Checkout isn't customisable on this plan.",dns:"Nothing relevant."},keyTool:'admin',
+dx:{opts:["The two discounts aren't set to combine, so the code is blocked when the automatic one applies","The code has hit its usage limit","Customers are typing it in lowercase","The newsletter link is broken"],a:0,why:"Shopify only stacks discounts when each one allows combining with the other's class (product, order, shipping)."},
+fix:{opts:["Check with Lucy whether they should stack; if yes, allow combinations on both and test with a Sale item","Delete the automatic discount","Create a brand new code","Tell customers to remove Sale items"],a:0,why:"Stacking costs margin, so it's the client's decision before it's a settings change."},
+hidden:"Lucy is happy for them to stack this week only. Margins on sale items are tight.",
+model:"Hi Lucy,\n\nThanks for spotting the Sale pattern, that's exactly it. Shopify won't let two discounts apply to the same order unless both are set to allow it. Customers with Sale items already get the automatic 20% off, so WINTER15 is being blocked. Your test basket didn't include a Sale item, which is why it worked for you.\n\nBefore I change anything: allowing them to combine means a Sale item could end up with both discounts. Would you like that for this week, or would you prefer WINTER15 to apply only to full-price items?\n\nOnce you confirm, it's about 15 minutes to update and test, covered by your support plan. I can also draft a short reply for the customers who emailed.\n\nKind regards,\nAlex",
+learn:"\"Works for me\" usually means your test is different from the customer's. Recreate their exact basket. Discount combinations are set per discount.",url:"https://help.shopify.com/en/manual/discounts/combining-discounts"},
+{id:'b6',desk:'Freelance',p:'Shopify',area:'DNS, domains & email',client:'Oak & Ember Candles',from:'Rachel Moss, Owner',subject:'New domain sometimes shows a parked page',plan:'Launch package · go-live support included',site:'oakandember.co.uk · Shopify',pri:'High',bill:'covered',
+body:"Hi Alex,\n\nI followed the Shopify steps and added the A record 23.227.38.65 at my domain company yesterday afternoon. I didn't delete anything as I wasn't sure what the other records did.\n\nSometimes the shop loads and sometimes I get the old 'this domain is parked' page. Is it just still updating?\n\nWe're announcing the launch on Instagram tomorrow morning.\n\nRachel",
+key:{opts:["She didn't delete any of the existing records","She's announcing on Instagram tomorrow","She added the record yesterday afternoon","She followed Shopify's steps"],a:0},
+ev:{site:"10 requests to oakandember.co.uk:\n  6 × Shopify storefront\n  4 × 'This domain is parked'",logs:"Shopify › Domains: oakandember.co.uk\n  Connection issue: additional A records found",admin:"Shopify › Domains: primary domain pending verification",code:"Nothing relevant.",dns:"oakandember.co.uk   A      23.227.38.65\noakandember.co.uk   A      185.53.177.20   (registrar parking)\nwww                 CNAME  parking.registrar-host.net"},keyTool:'dns',
+dx:{opts:["The old parking A record is still there, so visitors are split between two servers","DNS just needs 72 hours to update","Shopify's servers are having problems","It's her browser cache"],a:0,why:"Two A records on one name means visitors get either address at random. That explains \"sometimes\", which propagation wouldn't."},
+fix:{opts:["Remove the parking A record, point www at shops.myshopify.com, verify in Shopify and check with a DNS lookup","Wait another 48 hours","Move the nameservers to Shopify","Add a second Shopify A record"],a:0,why:"Removing the duplicate fixes the split; the www record is the second half of the job."},
+hidden:"Rachel's domain is with a UK budget registrar. She can share a login or screenshots. There's no email on the domain yet.",
+model:"Hi Rachel,\n\nYou did the right thing adding that record. The issue is that the domain company's original 'parked' record is still there alongside it, so visitors are randomly sent to either your shop or the parked page. That's why it works some of the time, and waiting won't fix it.\n\nTwo small changes are needed: remove the old parked record, and point the www version of your address at Shopify too. If you can share access to your domain account, or a screenshot of the records page, I'll make the changes, check them with a lookup tool and confirm everything in Shopify.\n\nThis is covered by your launch package, and once the changes are made it usually settles within an hour or two, so you'll be fine for tomorrow morning.\n\nBest,\nAlex",
+learn:"\"Sometimes it works\" points to duplicate records, not propagation. Check every record on the name, not just the one you added.",url:"https://help.shopify.com/en/manual/domains/add-a-domain/connecting-domains/connect-domain-manual"}
+];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const today=()=>new Date().toLocaleDateString('en-CA');
+function shuf(t){for(const q of ['key','dx','fix']){const right=t[q].opts[t[q].a];const o=t[q].opts.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}t[q].opts=o;t[q].a=o.indexOf(right)}return t}
+function fresh(){return{v:1,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],queue:BANK.map(t=>shuf(clone(t))),seen:[]}}
+let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
+if(!S||!Array.isArray(S.queue))S=fresh();
+let cur=S.queue[0]?.id||null,sample=null,dbRef=null,genBusy=false,genMsg='',claudeState='checking',saveChain=Promise.resolve();
+const W={},DONE={};
+function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',chat:[],chatBusy:false,q:'',start:Date.now(),done:null,err:''})}
+function find(id){return S.queue.find(t=>t.id===id)||DONE[id]}
+function save(){try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}
+  if(dbRef){const snap=clone(S);saveChain=saveChain.then(()=>dbRef.set(snap)).catch(()=>{})}}
+function certFor(n){let c=null;for(const x of CERTS)if(n>=x[0])c=x;return c}
+function nextCert(n){return CERTS.find(x=>n<x[0])}
+function areaPct(a){const r=S.areas[a];return r&&r.m?r.s/r.m:null}
+function weakest(){let best=null,bv=2;for(const a of AREAS){const r=S.areas[a];const v=!r||!r.n?-1+Math.random()*.01:r.s/r.m;if(v<bv){bv=v;best=a}}return best}
+function fmtT(ms){const s=Math.floor(ms/1000);return Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s'}
+
+function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:0;
+  const pct=nx?Math.round((n-prev)/(nx[0]-prev)*100):100;const avg=S.max?Math.round(S.sum/S.max*100):0;
+  const st={checking:'Connecting to Claude…',on:'Claude is connected: new tickets on demand, live client chat and reply marking.',off:'Offline mode: built-in tickets with self-marking. Open this page on claude.ai for unlimited tickets.'}[claudeState];
+  $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>WordPress and Shopify support tickets, worked like the real thing.</p></div>
+  <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
+  <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
+  <div class="status">${esc(st)}</div>`}
+
+function renderQueue(){const open=S.queue;$('#qh').textContent=`Queue · ${open.length} open`;
+  $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear.</p>`;
+  const opts=['<option value="">Auto: focus on my weakest area</option>'].concat(AREAS.map(a=>`<option>${esc(a)}</option>`)).join('');
+  $('#gen').innerHTML=claudeState==='on'?`<label for="garea">Pull a new ticket</label><select id="garea">${opts}</select><button class="btn w" id="genbtn" ${genBusy?'disabled':''}>${genBusy?'<span class="spin"></span>Ticket incoming…':'Pull ticket'}</button><p class="err">${esc(genMsg)}</p>`
+  :`<p class="hintline">${claudeState==='off'?'New tickets need Claude. Open this page from its claude.ai link, then retry.':claudeState==='checking'?'<span class="spin"></span>Connecting to Claude…':''}</p>${claudeState==='off'?'<button class="btn w" id="reconnect">Retry connecting</button>':''}${open.length?'':'<button class="btn ghost w" id="replay">Replay built-in tickets</button>'}`}
+
+function opt(name,val,label,checked){return `<label class="opt"><input type="radio" name="${name}" value="${esc(val)}" ${checked?'checked':''}><span>${esc(label)}</span></label>`}
+
+function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>${claudeState==='on'?'Pull a new ticket from the queue.':'Your queue is clear.'}</p></div>`;$('#res').innerHTML='';return}
+  const x=w(t.id);
+  const tabs=TOOLS.map(([k,l])=>`<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)?' seen':''}" data-tab="${k}">${l}</button>`).join('');
+  let pane='';
+  if(x.tab==='ticket')pane=`<div class="body">${esc(t.body)}</div>`;
+  else if(x.tab==='chat'){pane=claudeState==='on'?`<div class="chatlog">${x.chat.map(m=>`<div class="msg ${m.r==='me'?'me':'cl'}">${esc(m.t)}</div>`).join('')||`<p class="hintline">Ask ${esc(t.from.split(',')[0])} a follow-up question. Good questions cost nothing; you get 5 per ticket.</p>`}${x.chatBusy?'<div class="msg cl"><span class="spin"></span>Typing…</div>':''}</div>
+    <form class="row" id="chatf"><input type="text" id="chatq" maxlength="300" placeholder="Your question to the client" value="${esc(x.q)}" ${x.chat.length>=10||x.done?'disabled':''}><button class="btn" ${x.chatBusy||x.chat.length>=10||x.done?'disabled':''}>Ask</button></form>`:`<p class="hintline">Client chat needs Claude. Open the page on claude.ai to use it.</p>`}
+  else pane=`<pre class="con">${esc(t.ev[x.tab]||'Nothing relevant.')}</pre><p class="hintline">${{site:'Front-end check: status codes, headers, console and speed.',logs:'Server, PHP and platform logs.',admin:'WordPress or Shopify admin settings, plugins and apps.',code:'Theme and config files.',dns:'DNS records and mail headers.'}[x.tab]}</p>`;
+  $('#work').innerHTML=`<article class="tk"><div class="chips"><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
+  <h2>${esc(t.subject)}</h2>
+  <div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>
+  <div class="tabs" role="tablist">${tabs}</div>${pane}</article>`;
+  renderRes(t,x)}
+
+function renderRes(t,x){
+  if(x.done){renderReview(t,x);return}
+  $('#res').innerHTML=`<h2>Resolve this ticket</h2>
+  <fieldset><legend>1. Which detail in the ticket matters most?</legend>${t.key.opts.map((o,i)=>opt('key',i,o,x.key===i)).join('')}</fieldset>
+  <fieldset><legend>2. Priority</legend><div class="seg">${PRI.map(p=>opt('pri',p,p,x.pri===p)).join('')}</div></fieldset>
+  <fieldset><legend>3. Billing</legend>${Object.entries(BILL).map(([k,l])=>opt('bill',k,l,x.bill===k)).join('')}</fieldset>
+  <fieldset><legend>4. Most likely cause</legend>${t.dx.opts.map((o,i)=>opt('dx',i,o,x.dx===i)).join('')}</fieldset>
+  <fieldset><legend>5. First fix</legend>${t.fix.opts.map((o,i)=>opt('fix',i,o,x.fix===i)).join('')}</fieldset>
+  <fieldset><legend>6. Reply to ${esc(t.from.split(',')[0])}</legend><textarea id="reply" placeholder="Write the reply you'd send from the help desk.">${esc(x.reply)}</textarea></fieldset>
+  <p class="err">${esc(x.err)}</p><button class="btn w" id="submit">Submit and resolve</button>`}
+
+function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));const kt=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;
+  return[['Spotted the key detail',x.key===t.key.a?3:0,3,x.key===t.key.a?'':'Key detail: '+t.key.opts[t.key.a]],
+  ['Priority',d===0?2:d===1?1:0,2,d===0?'':'Expected: '+t.pri],
+  ['Billing',x.bill===t.bill?2:0,2,x.bill===t.bill?'':'Expected: '+BILL[t.bill]],
+  ['Checked the right tool',x.tools.includes(t.keyTool)?2:0,2,x.tools.includes(t.keyTool)?'':'The evidence was in '+kt],
+  ['Diagnosis',x.dx===t.dx.a?4:0,4,t.dx.why],['First fix',x.fix===t.fix.a?4:0,4,t.fix.why]]}
+
+function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.reduce((a,p)=>a+p[1],0);const tot=base+(rp??0);
+  let replyBlock='';
+  if(x.done.state==='grading')replyBlock=`<p><span class="spin"></span>Claude is marking your reply…</p>`;
+  else if(x.done.state==='self')replyBlock=`<p class="note">Compare your reply with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w" id="selfok">Confirm reply score</button>`;
+  else{const fb=x.done.fb;replyBlock=fb?`<table class="parts">${CHECKS.map(([k,l])=>`<tr><td>${esc(l)}</td><td class="${fb.checks?.[k]?'hit':'miss'}">${fb.checks?.[k]?'Yes':'Missed'}</td></tr>`).join('')}</table>
+    ${fb.good?.length?`<p class="note"><b>What worked:</b> ${fb.good.map(esc).join(' ')}</p>`:''}${fb.fix?.length?`<p class="note"><b>Improve:</b> ${fb.fix.map(esc).join(' ')}</p>`:''}`:''}
+  $('#res').innerHTML=`<h2>Ticket resolved</h2><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
+  <table class="parts">${P.map(p=>`<tr><td>${esc(p[0])}${p[1]<p[2]?`<div class="miss note">${esc(p[3])}</div>`:''}</td><td class="${p[1]===p[2]?'hit':'miss'}">${p[1]}/${p[2]}</td></tr>`).join('')}<tr><td>Client reply</td><td>${rp==null?'…':rp+'/8'}</td></tr></table>
+  ${replyBlock}
+  <details ${x.done.state==='self'?'open':''}><summary>Model reply</summary><p class="body" style="font-size:15px">${esc(t.model)}</p></details>
+  ${x.done.fb?.rewrite?`<details><summary>Your reply, improved</summary><p class="body" style="font-size:15px">${esc(x.done.fb.rewrite)}</p></details>`:''}
+  <p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>${/^https:\/\//.test(t.url||'')?`<p class="note"><a href="${esc(t.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}
+  ${x.done.state==='final'?`<button class="btn w" id="next">${S.queue.length?'Next ticket':claudeState==='on'?'Pull the next ticket':'Finish'}</button>`:''}`}
+
+function renderFoot(){const wk=weakest();
+  const sk=AREAS.map(a=>{const r=S.areas[a],p=areaPct(a);return `<div class="sk"><span>${esc(a)}</span><div class="bar"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><b>${p==null?'–':Math.round(p*100)+'%'}</b></div>`}).join('');
+  $('#foot').innerHTML=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Auto tickets target this area.</p></div>
+  <div><h2>Certificates</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])}</span><span>${c[0]} tickets</span></li>`).join('')}</ol></div>
+  <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`}
+
+function render(){renderHdr();renderQueue();renderWork();renderFoot()}
+
+function commit(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.reply||0);
+  S.resolved++;S.sum+=tot;S.max+=25;const r=S.areas[t.area]||(S.areas[t.area]={s:0,m:0,n:0});r.s+=tot;r.m+=25;r.n++;
+  const d=today();if(S.lastDay!==d){const y=new Date(Date.now()-864e5).toLocaleDateString('en-CA');S.streak=S.lastDay===y?(S.streak||0)+1:1;S.lastDay=d}
+  S.hist.unshift({s:t.subject,a:t.area,g:tot,at:Date.now()});S.hist=S.hist.slice(0,60);
+  S.seen.push(t.subject);S.seen=S.seen.slice(-40);DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);x.done.state='final';save()}
+
+async function ask(prompt,tier){const r=await sample(prompt,{modelTier:tier||'default'});return r.text||''}
+function parseJSON(s){const a=s.indexOf('{'),b=s.lastIndexOf('}');if(a<0||b<a)throw new Error('no json');return JSON.parse(s.slice(a,b+1))}
+
+async function grade(t,x){
+  const prompt=`You are a senior support lead marking a junior web developer's reply to a client support ticket. Be fair, specific and brief. UK English.
+TICKET (${t.desk}, ${t.p}) from ${t.from} at ${t.client}. Plan: ${t.plan}.
+${t.body}
+HIDDEN TRUTH: key detail = "${t.key.opts[t.key.a]}"; cause = "${t.dx.opts[t.dx.a]}"; correct first fix = "${t.fix.opts[t.fix.a]}"; billing = "${BILL[t.bill]}" (ad-hoc rate £40/hr, not VAT registered).
+MODEL REPLY:
+${t.model}
+CANDIDATE REPLY:
+${x.reply}
+Mark against these 8 checks (true/false each): read (addresses the buried key detail), plain (non-technical, client-friendly), tone (professional, proactive, no emojis), why (explains the cause and justifies the work), next (clear next steps and timing), money (handles billing correctly: covered by plan, flags overage with cost, or gives an ad-hoc estimate at £40/hr), safe (mentions safe practice such as staging, backups or testing where relevant), conf (does not name the hosting provider, staff, server hostnames or raw tickets; "our managed server team" is fine).
+Return ONLY JSON: {"checks":{"read":bool,"plain":bool,"tone":bool,"why":bool,"next":bool,"money":bool,"safe":bool,"conf":bool},"good":["one short sentence"],"fix":["up to two short sentences"],"rewrite":"an improved version of the candidate's reply, keeping their voice"}`;
+  try{const j=parseJSON(await ask(prompt,'default'));const ch=j.checks||{};
+    x.done.fb={checks:ch,good:(j.good||[]).slice(0,2).map(String),fix:(j.fix||[]).slice(0,3).map(String),rewrite:String(j.rewrite||'')};
+    x.done.reply=CHECKS.filter(([k])=>ch[k]===true).length;commit(t,x)}
+  catch(e){x.done.state='self'}
+  if(cur===t.id)render()}
+
+function validTicket(j){const ok3=q=>q&&Array.isArray(q.opts)&&q.opts.length===4&&Number.isInteger(q.a)&&q.a>=0&&q.a<4;
+  return j&&typeof j.subject==='string'&&typeof j.body==='string'&&ok3(j.key)&&ok3(j.dx)&&ok3(j.fix)&&j.ev&&PRI.includes(j.pri)&&BILL[j.bill]&&['site','logs','admin','code','dns'].includes(j.keyTool)&&typeof j.model==='string'}
+
+async function gen(areaPick){if(genBusy||!sample)return;genBusy=true;genMsg='';renderQueue();
+  const area=areaPick||weakest();const n=S.resolved;
+  const diff=n<10?'straightforward: one clear key detail, mild distractors':n<50?'moderate: include one red herring in the evidence':'hard: the client states a wrong assumption, and the evidence contains a red herring';
+  const desk=Math.random()<.5?'Agency desk (school, charity or SME on a support retainer; refer to "our managed server team", never a hosting brand)':'Freelance (small UK business; care plan with hours or ad-hoc at £40/hr)';
+  const ex=clone(BANK[0]);delete ex.id;
+  const prompt=`Write ONE realistic support ticket for a training simulator for a UK WordPress (Divi, ACF, Gravity Forms, WooCommerce, Yoast) and Shopify (Liquid, OS 2.0, apps, Markets, Klaviyo) developer.
+Area: ${area}. Platform must fit the area. Desk: ${desk}. Difficulty: ${diff}.
+Rules: invent the client business and contact (UK). The client writes like a real non-technical person. Bury the most important clue inside ordinary detail. Evidence in ev.site/logs/admin/code/dns must look like real tool output (headers, log lines, settings, code, DNS records); 1-3 of them relevant, the rest "Nothing relevant." or a mild red herring. keyTool is the ev key holding the decisive evidence. All four options in key, dx and fix must be plausible; a is the index of the correct one. pri is one of Low, Normal, High, Urgent. bill is covered, overage or adhoc, consistent with the plan's hours. hidden = facts the client knows if asked (not the diagnosis). model = an excellent reply from Alex: plain English, explains cause and value, next steps, timing, billing handled, staging/testing where relevant, no emojis, never names a hosting provider. learn = one or two sentence takeaway. url = a real https documentation page (developer.wordpress.org, wordpress.org, woocommerce.com, shopify.dev, help.shopify.com or the plugin's own docs).
+Avoid repeating these recent subjects: ${S.seen.slice(-20).join(' | ')||'none'}.
+Return ONLY JSON with exactly these keys, same shape as this example:
+${JSON.stringify(ex)}`;
+  try{const j=parseJSON(await ask(prompt,'default'));if(!validTicket(j))throw new Error('shape');
+    const t=shuf({id:'g'+Date.now(),desk:String(j.desk||'Freelance'),p:String(j.p||''),area:AREAS.includes(j.area)?j.area:area,client:String(j.client||''),from:String(j.from||'Client'),subject:j.subject,plan:String(j.plan||''),site:String(j.site||''),pri:j.pri,bill:j.bill,body:j.body,
+      key:j.key,ev:{site:String(j.ev.site||''),logs:String(j.ev.logs||''),admin:String(j.ev.admin||''),code:String(j.ev.code||''),dns:String(j.ev.dns||'')},keyTool:j.keyTool,
+      dx:{...j.dx,why:String(j.dx.why||'')},fix:{...j.fix,why:String(j.fix.why||'')},hidden:String(j.hidden||''),model:j.model,learn:String(j.learn||''),url:String(j.url||'')});
+    t.key.opts=t.key.opts.map(String);t.dx.opts=t.dx.opts.map(String);t.fix.opts=t.fix.opts.map(String);
+    S.queue.push(t);if(!find(cur)||DONE[cur])cur=t.id;save()}
+  catch(e){genMsg=e&&e.code==='rate_limited'?'Claude is busy. Try again in a minute.':e&&e.code==='not_granted'?'Claude access was declined for this page.':'That ticket came out malformed. Try again.';if(e&&e.code==='not_granted'){claudeState='off'}}
+  genBusy=false;render()}
+
+async function chat(t,x){const q=x.q.trim();if(!q||x.chatBusy)return;x.chat.push({r:'me',t:q});x.q='';x.chatBusy=true;renderWork();
+  const hist=x.chat.map(m=>(m.r==='me'?'Developer: ':'You: ')+m.t).join('\n');
+  const prompt=`Role-play ${t.from} at ${t.client}, a non-technical UK client who raised this support ticket:
+${t.body}
+Things you know if asked: ${t.hidden}
+Stay in character. Answer only what you'd plausibly know, in 1-3 short sentences. Never state the technical cause or the fix. If asked something you don't know, say so naturally.
+Conversation:
+${hist}
+Reply as the client only, no name prefix.`;
+  try{x.chat.push({r:'cl',t:(await ask(prompt,'quick')).trim()})}catch(e){x.chat.push({r:'cl',t:'(The client didn\'t reply. Try again shortly.)'})}
+  x.chatBusy=false;if(cur===t.id)renderWork()}
+
+document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
+  if(el.dataset.open){cur=el.dataset.open;w(cur);render();if(innerWidth<1180)$('#work').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});return}
+  const t=find(cur),x=t&&w(t.id);
+  if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);renderWork();return}
+  if(el.id==='genbtn'){gen($('#garea').value);return}
+  if(el.id==='replay'){S.queue=BANK.map(b=>shuf(clone(b)));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;save();render();return}
+  if(el.id==='submit'&&t){x.reply=$('#reply').value;
+    if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);return}
+    if(x.reply.trim().length<60){x.err='Write a fuller reply to the client.';renderRes(t,x);return}
+    x.err='';x.done={parts:parts(t,x),reply:null,fb:null,state:sample&&claudeState==='on'?'grading':'self',at:Date.now()};render();if(x.done.state==='grading')grade(t,x);return}
+  if(el.id==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;commit(t,x);render();return}
+  if(el.id==='next'){if(S.queue.length){cur=S.queue[0].id;render();if(S.queue.length<3&&claudeState==='on')gen()}else if(claudeState==='on'){cur=null;render();gen()}else{cur=null;render()}}
+});
+document.addEventListener('change',e=>{const t=find(cur);if(!t)return;const x=w(t.id),n=e.target.name,v=e.target.value;
+  if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
+document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value});
+document.addEventListener('submit',e=>{if(e.target.id!=='chatf')return;e.preventDefault();const t=find(cur);if(t)chat(t,w(t.id))});
+const tick=setInterval(()=>{const el=$('#timer'),t=find(cur);if(el&&t&&W[t.id]&&!W[t.id].done)el.textContent=fmtT(Date.now()-W[t.id].start)},1000);
+
+render();
+async function connect(){claudeState='checking';render();let C=null;
+  for(let i=0;i<60&&!(C=window.claude)?.use;i++)await new Promise(r=>setTimeout(r,250));
+  if(!C||!C.use){claudeState='off';render();return null}
+  try{sample=await C.use('sample')}catch(e){sample=null}claudeState=sample?'on':'off';render();return C}
+document.addEventListener('click',e=>{if(e.target.closest('#reconnect'))connect()});
+(async()=>{const C=await connect();if(!C)return;
+  try{const db=await C.use('db'),u=await C.use('user');if(db&&u){const id=await u.id();if(id){dbRef=db.doc('data/users/'+id+'/progress');
+    const snap=await dbRef.get();if(snap.exists){const d=snap.data();if(d&&Array.isArray(d.queue)&&(d.resolved||0)>=(S.resolved||0)){S=clone(d);if(!find(cur))cur=S.queue[0]?.id||null;try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}render()}else save()}
+    else if(S.resolved)save()}}}catch(e){dbRef=null}})();
+}
+</script></body></html>
