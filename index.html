@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Service Desk Simulator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
@@ -12,12 +13,13 @@
 :root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Literata,Georgia,serif;overflow-x:clip}
-button,input,select,textarea{font:inherit;color:inherit}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Literata,Georgia,serif;overflow-x:clip;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
 button{cursor:pointer}
 :focus-visible{outline:3px solid var(--pr);outline-offset:2px}
 .band{padding:clamp(18px,3vw,36px) max(4vw,16px)}
-header.band{background:var(--prb);color:#fff;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:end;justify-content:space-between}
+header.band{background:var(--prb);color:#fff;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:end;justify-content:space-between;padding-top:max(clamp(18px,3vw,36px),env(safe-area-inset-top))}
 h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0;font-weight:700;text-wrap:balance}
 header p{margin:6px 0 0;opacity:.85;font-size:15px}
 .stats{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:end}
@@ -80,7 +82,26 @@ ol,ul{margin:0;padding:0;list-style:none}
 @keyframes r{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.spin{animation:none}}
 @media(max-width:1180px){main{grid-template-columns:240px minmax(0,1fr)}.res{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.foot{grid-template-columns:1fr 1fr}.foot>:first-child{grid-column:1/-1}}
-@media(max-width:760px){main{grid-template-columns:1fr}.queue{border-right:0;border-bottom:1px solid var(--line)}#qlist{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory}.qitem{flex:0 0 78%;scroll-snap-align:start;margin:0}.foot{grid-template-columns:1fr}.sk{grid-template-columns:minmax(0,1fr) 90px 56px}}
+/* Phone: stacked queue → tools/chat → reply; sticky progress stays clear of the reply box */
+@media(max-width:760px){
+  header.band{position:sticky;top:0;z-index:30;gap:10px 16px;padding:max(12px,env(safe-area-inset-top)) max(4vw,16px) 12px}
+  header.band h1{font-size:22px}
+  header.band p{display:none}
+  .stats{gap:8px 14px}.stat b{font-size:18px}.stat span{font-size:12px}.cert{min-width:0;flex:1 1 100%}
+  .status{font-size:12px}
+  main{grid-template-columns:1fr}
+  .queue,.work,.res{padding:14px max(4vw,16px)}
+  .queue{border-right:0;border-bottom:1px solid var(--line)}
+  #qlist{display:flex;flex-direction:column;gap:8px;overflow:visible}
+  .qitem{width:100%;margin:0}
+  .tabs{gap:2px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+  .msg{max-width:100%}
+  .row{flex-wrap:wrap}.row input{flex:1 1 100%}.row .btn{flex:1 1 100%}
+  .res{border-left:0;border-top:1px solid var(--line);padding-bottom:max(24px,env(safe-area-inset-bottom))}
+  #reply,.res h2,fieldset{scroll-margin-top:110px}
+  .foot{grid-template-columns:1fr;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+  .sk{grid-template-columns:minmax(0,1fr) 90px 56px}
+}
 </style></head><body>
 <header class="band" id="hdr"></header>
 <main>
@@ -92,7 +113,8 @@ ol,ul{margin:0;padding:0;list-style:none}
 <script>
 {
 const AREAS=['WordPress core & PHP','Plugins & WooCommerce','Performance & caching','Security & hacked sites','Divi & page builders','Shopify themes & Liquid','Shopify apps & integrations','Shopify admin & checkout','DNS, domains & email'];
-const CERTS=[[10,'First line support'],[25,'Support technician'],[50,'Second line support'],[100,'Senior support engineer'],[250,'Third line developer'],[500,'Support team lead'],[1000,'Head of support']];
+/* UK market bands (£k): title jumps at ticket thresholds; midpoint drifts with score and streak */
+const CERTS=[[10,'First line support',22,28],[50,'Experienced agent',28,35],[150,'Senior / specialist',35,45],[400,'Team lead',45,55],[1000,'Head of support',55,75]];
 const TOOLS=[['ticket','Ticket'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail'],['chat','Client chat']];
 const PRI=['Low','Normal','High','Urgent'];
 const BILL={covered:'Covered by plan',overage:'Covered, but flag overage',adhoc:'Ad-hoc quote'};
@@ -169,16 +191,21 @@ function save(){try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch
   if(dbRef){const snap=clone(S);saveChain=saveChain.then(()=>dbRef.set(snap)).catch(()=>{})}}
 function certFor(n){let c=null;for(const x of CERTS)if(n>=x[0])c=x;return c}
 function nextCert(n){return CERTS.find(x=>n<x[0])}
+function salaryMid(c){if(!c)return null;const lo=c[2],hi=c[3],mid=(lo+hi)/2,half=(hi-lo)/2;
+  const avg=S.max?S.sum/S.max:.5;const scorePull=(avg-.5)*2;const streakPull=Math.min(1,(S.streak||0)/14)*.4;
+  const drift=Math.max(-1,Math.min(1,scorePull*.9+streakPull*.5));return Math.round(mid+drift*half)}
+function fmtBand(c){return c?`£${c[2]}–${c[3]}k`:'—'}
 function areaPct(a){const r=S.areas[a];return r&&r.m?r.s/r.m:null}
 function weakest(){let best=null,bv=2;for(const a of AREAS){const r=S.areas[a];const v=!r||!r.n?-1+Math.random()*.01:r.s/r.m;if(v<bv){bv=v;best=a}}return best}
 function fmtT(ms){const s=Math.floor(ms/1000);return Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s'}
 
 function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:0;
   const pct=nx?Math.round((n-prev)/(nx[0]-prev)*100):100;const avg=S.max?Math.round(S.sum/S.max*100):0;
+  const pay=salaryMid(c);const payLine=c?`~£${pay}k · ${fmtBand(c)} UK`:(nx?`Aiming for ${fmtBand(nx)} UK`:'');
   const st={checking:'Connecting to Claude…',on:'Claude is connected: new tickets on demand, live client chat and reply marking.',off:'Offline mode: built-in tickets with self-marking. Open this page on claude.ai for unlimited tickets.'}[claudeState];
   $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>WordPress and Shopify support tickets, worked like the real thing.</p></div>
   <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
-  <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
+  <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${esc(payLine)}${payLine?' · ':''}${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
   <div class="status">${esc(st)}</div>`}
 
 function renderQueue(){const open=S.queue;$('#qh').textContent=`Queue · ${open.length} open`;
@@ -238,7 +265,7 @@ function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.red
 function renderFoot(){const wk=weakest();
   const sk=AREAS.map(a=>{const r=S.areas[a],p=areaPct(a);return `<div class="sk"><span>${esc(a)}</span><div class="bar"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><b>${p==null?'–':Math.round(p*100)+'%'}</b></div>`}).join('');
   $('#foot').innerHTML=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Auto tickets target this area.</p></div>
-  <div><h2>Certificates</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])}</span><span>${c[0]} tickets</span></li>`).join('')}</ol></div>
+  <div><h2>Career path · UK salary</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])} · ${fmtBand(c)}</span><span>${c[0]} tickets</span></li>`).join('')}</ol><p class="hintline">Title jumps at ticket thresholds; the £ midpoint drifts with average score and streak.</p></div>
   <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`}
 
 function render(){renderHdr();renderQueue();renderWork();renderFoot()}
