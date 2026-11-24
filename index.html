@@ -9,7 +9,7 @@
    IDEA: a ticketing workbench like Zoho Desk, with SMS client threads and lab-bench evidence drawers.
    PICTURE: the open ticket and its tool tabs, filling the first screen mid-use.
    COLOUR and TYPE: white ground, prussian band and actions, carmine for urgency and misses; Literata throughout.
-   LAYOUT: band with progress, then queue | messages + tools | resolve; skills and career path below. */
+   LAYOUT: desktop = queue | messages + tools | resolve; phone = one-focus screens (queue → ticket → tools → reply → score). */
 :root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
@@ -82,6 +82,7 @@ legend{font-weight:600;font-size:15px;margin-bottom:6px;padding:0}
 .note{font-size:14px;margin:4px 0 10px}
 details{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:8px 0;background:var(--bg)}summary{cursor:pointer;font-weight:600;min-height:28px}
 .foot{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:28px;max-width:1600px;margin:0 auto}
+.foot-desk{display:contents}
 .sk{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 64px;gap:8px;align-items:center;font-size:14px;margin-bottom:6px}
 .bar{height:10px;background:var(--panel);border:1px solid var(--line);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pr)}
 .sk b{text-align:right;font-weight:600;white-space:nowrap}
@@ -93,25 +94,69 @@ ol,ul{margin:0;padding:0;list-style:none}
 @keyframes r{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.spin,.bubble{animation:none}}
 @media(max-width:1180px){main{grid-template-columns:240px minmax(0,1fr)}.res{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.foot{grid-template-columns:1fr 1fr}.foot>:first-child{grid-column:1/-1}}
-/* Phone: stacked queue → tools/chat → reply; sticky progress stays clear of the reply box */
+/* Phone chrome: step rail + sticky primary action (hidden on desktop) */
+.mnav,.mbar,.mback,.monly{display:none}
+.mnav{gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:0 0 10px;margin:0 0 4px;border-bottom:1px solid var(--line)}
+.mnav button{flex:none;background:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;font-size:13px;font-weight:600;color:var(--mute)}
+.mnav button.on{border-color:var(--pr);color:var(--pr);background:light-dark(#eef5fb,#132033)}
+.mnav button[disabled]{opacity:.4}
+.mback{align-items:center;gap:6px;background:none;border:0;color:var(--pr);font-weight:600;padding:0;min-height:40px;margin:0 0 8px;font-size:14px}
+.mbar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;gap:8px;padding:10px max(4vw,16px) calc(10px + env(safe-area-inset-bottom));background:light-dark(rgba(255,255,255,.96),rgba(15,18,23,.96));border-top:1px solid var(--line);backdrop-filter:saturate(1.2) blur(8px)}
+.mbar .btn{flex:1;margin:0}
+.sheet{border:1px solid var(--line);border-radius:10px;background:var(--bg);margin:8px 0}
+.sheet>summary{list-style:none;cursor:pointer;font-weight:600;padding:10px 12px;min-height:44px;display:flex;align-items:center;justify-content:space-between}
+.sheet>summary::-webkit-details-marker{display:none}
+.sheet>summary::after{content:"Show";font-size:13px;font-weight:600;color:var(--pr)}
+.sheet[open]>summary::after{content:"Hide"}
+.sheet .sheet-body{padding:0 12px 12px;border-top:1px solid var(--line)}
+/* Phone: one-focus screens — only the active stage is in view */
 @media(max-width:760px){
-  header.band{position:sticky;top:0;z-index:30;gap:10px 16px;padding:max(12px,env(safe-area-inset-top)) max(4vw,16px) 12px}
-  header.band h1{font-size:22px}
-  header.band p{display:none}
-  .stats{gap:8px 14px}.stat b{font-size:18px}.stat span{font-size:12px}.cert{min-width:0;flex:1 1 100%}
-  .status{font-size:12px}
-  main{grid-template-columns:1fr}
+  header.band{position:sticky;top:0;z-index:30;gap:8px 12px;padding:max(8px,env(safe-area-inset-top)) max(4vw,16px) 8px}
+  header.band h1{font-size:18px}
+  header.band p,.status{display:none}
+  .stats{gap:6px 12px}.stat b{font-size:16px}.stat span{font-size:11px}.cert{min-width:0;flex:1 1 100%}
+  .cert b{font-size:15px}.meter{margin-top:4px}
+  /* While working a ticket, shrink the band to title + career meter so the stage fills the screen */
+  body:not([data-mview=queue]) header.band{align-items:center}
+  body:not([data-mview=queue]) header.band>div:first-child{flex:0 1 auto}
+  body:not([data-mview=queue]) header.band h1{font-size:15px;line-height:1.2}
+  body:not([data-mview=queue]) .stats .stat:not(.cert){display:none}
+  body:not([data-mview=queue]) .cert{flex:1 1 auto;min-width:0}
+  body:not([data-mview=queue]) .cert b{font-size:14px}
+  body:not([data-mview=queue]) .cert span{font-size:11px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  main{grid-template-columns:1fr;border-bottom:0}
   .queue,.work,.res{padding:14px max(4vw,16px)}
   .queue{border-right:0;border-bottom:1px solid var(--line)}
   #qlist{display:flex;flex-direction:column;gap:8px;overflow:visible}
   .qitem{width:100%;margin:0}
   .tabs{gap:2px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
   .bubble{max-width:92%}
+  .sms-compose textarea{min-height:160px}
   .sms-compose .sendrow{flex-wrap:wrap}.sms-compose .sendrow .btn{flex:1 1 100%}
-  .res{border-left:0;border-top:1px solid var(--line);padding-bottom:max(24px,env(safe-area-inset-bottom))}
+  .res{border-left:0;border-top:0;padding-bottom:max(24px,env(safe-area-inset-bottom))}
   #reply,.res h2,fieldset,.sms{scroll-margin-top:110px}
-  .foot{grid-template-columns:1fr;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+  .foot{grid-template-columns:1fr;padding-bottom:max(24px,env(safe-area-inset-bottom));padding-top:8px}
+  .foot-desk{display:none}
+  .foot-inner{display:grid;gap:18px}
+  .foot>.sheet{margin:0}
   .sk{grid-template-columns:minmax(0,1fr) 90px 56px}
+  .tk h2{font-size:22px;margin:6px 0 10px}
+  .chips{margin-bottom:2px}
+  .mnav,.mback{display:flex}.monly{display:block}.mbar{display:flex}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  /* Hide every stage except the active mobile view */
+  body[data-mview=queue] .work,body[data-mview=queue] .res{display:none}
+  body[data-mview=ticket] .queue,body[data-mview=ticket] .res,
+  body[data-mview=tools] .queue,body[data-mview=tools] .res{display:none}
+  body[data-mview=resolve] .queue,body[data-mview=resolve] .work,
+  body[data-mview=score] .queue,body[data-mview=score] .work{display:none}
+  body:not([data-mview=queue]) .foot{display:none}
+  body[data-mview=queue] .mbar{display:none}
+  .md-meta{display:none}
+  /* Ticket screen: Messages first; tools screen: evidence drawers */
+  body[data-mview=ticket] .tabs [data-tab]:not([data-tab=ticket]){opacity:.55}
+  body[data-mview=tools] .tabs [data-tab=ticket]{opacity:.55}
+  .desk-submit{display:none}
 }
 </style></head><body>
 <header class="band" id="hdr"></header>
@@ -121,6 +166,8 @@ ol,ul{margin:0;padding:0;list-style:none}
   <aside class="res" id="res" aria-label="Resolution"></aside>
 </main>
 <section class="band foot" id="foot"></section>
+<!-- Phone sticky primary action; filled by renderMbar() -->
+<div class="mbar" id="mbar" hidden></div>
 <script>
 {
 const AREAS=['WordPress core & PHP','Plugins & WooCommerce','Performance & caching','Security & hacked sites','Divi & page builders','Shopify themes & Liquid','Shopify apps & integrations','Shopify admin & checkout','DNS, domains & email'];
@@ -195,9 +242,20 @@ function fresh(){return{v:1,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},
 let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
 if(!S||!Array.isArray(S.queue))S=fresh();
 let cur=S.queue[0]?.id||null;
+/* Phone one-focus stage: queue → ticket → tools → resolve → score (desktop ignores this) */
+let mview='queue';
 const W={},DONE={};
-function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',start:Date.now(),done:null,err:''})}
+function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',start:Date.now(),done:null,err:''})}
 function find(id){return S.queue.find(t=>t.id===id)||DONE[id]}
+function isPhone(){return matchMedia('(max-width:760px)').matches}
+function setMview(v){mview=v;document.body.dataset.mview=v;const bar=$('#mbar');if(bar)bar.hidden=!isPhone()||v==='queue'}
+function mnavHTML(active){const t=find(cur),x=t&&W[t.id],done=!!(x&&x.done);
+  const steps=[['queue','Queue'],['ticket','Ticket'],['tools','Tools'],['resolve','Reply'],['score','Score']];
+  return `<nav class="mnav" aria-label="Ticket stages">${steps.map(([k,l])=>{
+    const needTicket=k!=='queue';const needDone=k==='score';
+    const dis=(needTicket&&!t)||(needDone&&!done)||(k==='resolve'&&done)||(k==='score'&&!done);
+    return `<button type="button" data-mview="${k}"${k===active?' class="on"':''}${dis?' disabled':''}>${l}</button>`;
+  }).join('')}</nav>`}
 function save(){try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}}
 function certFor(n){let c=null;for(const x of CERTS)if(n>=x[0])c=x;return c}
 function nextCert(n){return CERTS.find(x=>n<x[0])}
@@ -233,36 +291,56 @@ function smsThread(t,x,opts){const who=t.from.split(',')[0];const parts=smsParts
   const notes=opts?.notes?`<div class="bubble in">${esc(t.hidden||'Nothing further from the client.')}<span class="meta-t">${esc(who)} · if asked</span></div>`:'';
   return `<div class="sms" role="log" aria-label="Text thread with ${esc(who)}">${smsHead(t)}${inBubbles}${notes}${draft}</div>`}
 
-function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Your queue is clear. Replay the built-in tickets when you are ready.</p></div>`;$('#res').innerHTML='';return}
+function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Your queue is clear. Replay the built-in tickets when you are ready.</p></div>`;$('#res').innerHTML='';renderMbar();return}
   const x=w(t.id);
   /* Map legacy 'chat' tab from older localStorage sessions onto Client notes */
   if(x.tab==='chat')x.tab='notes';
+  /* On phone tools stage, jump off Messages onto the key evidence drawer */
+  if(isPhone()&&mview==='tools'&&x.tab==='ticket'){x.tab=t.keyTool||'site';if(!x.tools.includes(x.tab))x.tools.push(x.tab)}
+  if(isPhone()&&mview==='ticket'&&x.tab!=='ticket'&&x.tab!=='notes'){/* keep chosen tool if user tapped a tab while on ticket stage */}
   const tabs=TOOLS.map(([k,l])=>`<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)||(k==='notes'&&x.tools.includes('chat'))?' seen':''}" data-tab="${k}">${l}</button>`).join('');
   let pane='';
-  if(x.tab==='ticket')pane=`${smsThread(t,x)}<p class="hintline">Client texts land here. Draft your reply in Resolve — it previews in the thread.</p>`;
+  if(x.tab==='ticket')pane=`${smsThread(t,x)}<p class="hintline">Client texts land here. Draft your reply under Reply — it previews in the thread.</p>`;
   else if(x.tab==='notes')pane=`${smsThread(t,x,{notes:true})}<p class="hintline">Extra facts ${esc(t.from.split(',')[0])} would share if asked — not the diagnosis.</p>`;
   else pane=`<pre class="con">${esc(t.ev[x.tab]||'Nothing relevant.')}</pre><p class="hintline">${{site:'Front-end check: status codes, headers, console and speed.',logs:'Server, PHP and platform logs.',admin:'WordPress or Shopify admin settings, plugins and apps.',code:'Theme and config files.',dns:'DNS records and mail headers.'}[x.tab]}</p>`;
-  $('#work').innerHTML=`<article class="tk"><div class="chips"><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
+  const meta=`<div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>`;
+  /* Phone: tuck plan/site/timer behind a sheet so the thread fills the first screen */
+  const metaBlock=`<div class="md-meta">${meta}</div><details class="sheet monly"><summary>Ticket details · <span id="timer-m">${fmtT((x.done?x.done.at:Date.now())-x.start)}</span></summary><div class="sheet-body">${meta}</div></details>`;
+  $('#work').innerHTML=`${mnavHTML(mview==='tools'?'tools':'ticket')}
+  <article class="tk"><div class="chips"><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
   <h2>${esc(t.subject)}</h2>
-  <div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>
+  ${metaBlock}
   <div class="tabs" role="tablist">${tabs}</div>${pane}</article>`;
-  renderRes(t,x)}
+  renderRes(t,x);renderMbar()}
 
 function renderRes(t,x){
   if(x.done){renderReview(t,x);return}
+  if(!x.rstep)x.rstep='triage';
   const who=t.from.split(',')[0];
-  $('#res').innerHTML=`<h2>Resolve this ticket</h2>
-  <fieldset><legend>1. Which detail in the ticket matters most?</legend>${t.key.opts.map((o,i)=>opt('key',i,o,x.key===i)).join('')}</fieldset>
+  const triage=`<fieldset><legend>1. Which detail in the ticket matters most?</legend>${t.key.opts.map((o,i)=>opt('key',i,o,x.key===i)).join('')}</fieldset>
   <fieldset><legend>2. Priority</legend><div class="seg">${PRI.map(p=>opt('pri',p,p,x.pri===p)).join('')}</div></fieldset>
   <fieldset><legend>3. Billing</legend>${Object.entries(BILL).map(([k,l])=>opt('bill',k,l,x.bill===k)).join('')}</fieldset>
   <fieldset><legend>4. Most likely cause</legend>${t.dx.opts.map((o,i)=>opt('dx',i,o,x.dx===i)).join('')}</fieldset>
-  <fieldset><legend>5. First fix</legend>${t.fix.opts.map((o,i)=>opt('fix',i,o,x.fix===i)).join('')}</fieldset>
-  <fieldset><legend>6. Text ${esc(who)} back</legend>
+  <fieldset><legend>5. First fix</legend>${t.fix.opts.map((o,i)=>opt('fix',i,o,x.fix===i)).join('')}</fieldset>`;
+  const reply=`<fieldset><legend>6. Text ${esc(who)} back</legend>
   ${smsThread(t,x)}
   <div class="sms-compose"><label class="hintline" for="reply">Your reply (as you'd send from the desk)</label>
   <textarea id="reply" maxlength="4000" placeholder="Hi ${esc(who)}, …">${esc(x.reply)}</textarea>
-  <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div></div></fieldset>
-  <p class="err">${esc(x.err)}</p><button class="btn w" id="submit">Send and resolve</button>`}
+  <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div></div></fieldset>`;
+  /* Phone: triage then reply as two short screens; desktop still shows the full form */
+  const phoneSplit=isPhone();
+  const body=phoneSplit
+    ?(x.rstep==='reply'?reply:triage)
+    :(triage+reply);
+  $('#res').innerHTML=`${mnavHTML('resolve')}
+  <h2>${phoneSplit&&x.rstep==='reply'?`Text ${esc(who)}`:'Resolve this ticket'}</h2>
+  ${body}
+  <p class="err">${esc(x.err)}</p>
+  ${phoneSplit
+    ?(x.rstep==='reply'
+      ?`<button class="btn w desk-submit" id="submit">Send and resolve</button>`
+      :`<button class="btn w desk-submit" id="to-reply">Continue to reply</button>`)
+    :`<button class="btn w" id="submit">Send and resolve</button>`}`}
 
 function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));const kt=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;
   return[['Spotted the key detail',x.key===t.key.a?3:0,3,x.key===t.key.a?'':'Key detail: '+t.key.opts[t.key.a]],
@@ -273,22 +351,56 @@ function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));cons
 
 function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.reduce((a,p)=>a+p[1],0);const tot=base+(rp??0);
   let replyBlock='';
-  if(x.done.state==='self')replyBlock=`<p class="note">Compare your text with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w" id="selfok">Confirm reply score</button>`;
-  $('#res').innerHTML=`<h2>Ticket resolved</h2><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
+  if(x.done.state==='self')replyBlock=`<p class="note">Compare your text with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w desk-submit" id="selfok">Confirm reply score</button>`;
+  $('#res').innerHTML=`${mnavHTML('score')}<h2>Ticket resolved</h2><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
   <table class="parts">${P.map(p=>`<tr><td>${esc(p[0])}${p[1]<p[2]?`<div class="miss note">${esc(p[3])}</div>`:''}</td><td class="${p[1]===p[2]?'hit':'miss'}">${p[1]}/${p[2]}</td></tr>`).join('')}<tr><td>Client reply</td><td>${rp==null?'…':rp+'/8'}</td></tr></table>
   ${replyBlock}
-  <div class="sms" style="margin-top:12px">${smsHead(t)}${smsParts(t.body).map(p=>`<div class="bubble in">${esc(p)}</div>`).join('')}${x.reply.trim()?`<div class="bubble out">${esc(x.reply)}<span class="meta-t">You · sent</span></div>`:''}</div>
+  <details class="sheet" ${x.done.state==='self'?'':'open'}><summary>Sent thread</summary><div class="sheet-body"><div class="sms">${smsHead(t)}${smsParts(t.body).map(p=>`<div class="bubble in">${esc(p)}</div>`).join('')}${x.reply.trim()?`<div class="bubble out">${esc(x.reply)}<span class="meta-t">You · sent</span></div>`:''}</div></div></details>
   <details ${x.done.state==='self'?'open':''}><summary>Model reply</summary><p class="body" style="font-size:15px">${esc(t.model)}</p></details>
   <p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>${/^https:\/\//.test(t.url||'')?`<p class="note"><a href="${esc(t.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}
-  ${x.done.state==='final'?`<button class="btn w" id="next">${S.queue.length?'Next ticket':'Finish'}</button>`:''}`}
+  ${x.done.state==='final'?`<button class="btn w desk-submit" id="next">${S.queue.length?'Next ticket':'Finish'}</button>`:''}`}
+
+function renderMbar(){const bar=$('#mbar');if(!bar)return;
+  if(!isPhone()||mview==='queue'){bar.hidden=true;bar.innerHTML='';return}
+  bar.hidden=false;const t=find(cur),x=t&&w(t.id);
+  let html='';
+  /* data-act mirrors in-page controls so we never duplicate button ids */
+  if(mview==='ticket')html=`<button type="button" class="btn" data-mview="tools">Inspect tools</button>`;
+  else if(mview==='tools')html=`<button type="button" class="btn" data-mview="resolve">Resolve ticket</button>`;
+  else if(mview==='resolve'&&x&&!x.done){
+    if(x.rstep==='reply')html=`<button type="button" class="btn ghost" data-act="to-triage">Triage</button><button type="button" class="btn" data-act="submit">Send and resolve</button>`;
+    else html=`<button type="button" class="btn" data-act="to-reply">Continue to reply</button>`;
+  }else if(mview==='score'&&x&&x.done){
+    if(x.done.state==='self')html=`<button type="button" class="btn" data-act="selfok">Confirm reply score</button>`;
+    else html=`<button type="button" class="btn" data-act="next">${S.queue.length?'Next ticket':'Finish'}</button>`;
+  }
+  bar.innerHTML=html}
 
 function renderFoot(){const wk=weakest();
   const sk=AREAS.map(a=>{const r=S.areas[a],p=areaPct(a);return `<div class="sk"><span>${esc(a)}</span><div class="bar"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><b>${p==null?'–':Math.round(p*100)+'%'}</b></div>`}).join('');
-  $('#foot').innerHTML=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Replay tickets to practise weak areas.</p></div>
+  const body=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Replay tickets to practise weak areas.</p></div>
   <div><h2>Career path · UK salary</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])} · ${fmtBand(c)}</span><span>${c[0]} tickets</span></li>`).join('')}</ol><p class="hintline">Title jumps at ticket thresholds; the £ midpoint drifts with average score and streak.</p></div>
-  <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`}
+  <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`;
+  /* Phone queue: keep skills/career behind a sheet so the open list is the first screen */
+  $('#foot').innerHTML=`<details class="sheet monly"><summary>Skills, career path and recent tickets</summary><div class="sheet-body foot-inner">${body}</div></details><div class="foot-desk">${body}</div>`}
 
-function render(){renderHdr();renderQueue();renderWork();renderFoot()}
+function render(){
+  if(!cur)mview='queue';
+  else if(isPhone()){
+    const x=W[cur];
+    if(x&&x.done)mview='score';
+    else if(mview==='score')mview='resolve';
+  }else mview='ticket';
+  setMview(mview);renderHdr();renderQueue();renderWork();renderFoot();window.scrollTo(0,0)}
+
+function goMview(v){const t=find(cur),x=t&&w(t.id);
+  if(v==='queue'){mview='queue';setMview(mview);renderQueue();renderMbar();window.scrollTo(0,0);return}
+  if(!t)return;
+  if(v==='ticket'){mview='ticket';if(x.tab!=='notes')x.tab='ticket';}
+  else if(v==='tools'){mview='tools';if(x.tab==='ticket'){x.tab=t.keyTool||'site';if(!x.tools.includes(x.tab))x.tools.push(x.tab)}}
+  else if(v==='resolve'){if(x.done){mview='score'}else{mview='resolve';if(!x.rstep)x.rstep='triage'}}
+  else if(v==='score'){if(x.done)mview='score';else return}
+  setMview(mview);renderWork();window.scrollTo(0,0)}
 
 function commit(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.reply||0);
   S.resolved++;S.sum+=tot;S.max+=25;const r=S.areas[t.area]||(S.areas[t.area]={s:0,m:0,n:0});r.s+=tot;r.m+=25;r.n++;
@@ -297,16 +409,26 @@ function commit(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.repl
   S.seen.push(t.subject);S.seen=S.seen.slice(-40);DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);x.done.state='final';save()}
 
 document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
-  if(el.dataset.open){cur=el.dataset.open;w(cur);render();if(innerWidth<1180)$('#work').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});return}
+  if(el.dataset.open){cur=el.dataset.open;w(cur).rstep='triage';mview='ticket';render();return}
+  if(el.dataset.mview){goMview(el.dataset.mview);return}
   const t=find(cur),x=t&&w(t.id);
-  if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);renderWork();return}
-  if(el.id==='replay'){S.queue=BANK.map(b=>shuf(clone(b)));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;save();render();return}
-  if(el.id==='submit'&&t){x.reply=$('#reply').value;
-    if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);return}
-    if(x.reply.trim().length<60){x.err='Write a fuller reply to the client.';renderRes(t,x);return}
-    x.err='';x.done={parts:parts(t,x),reply:null,fb:null,state:'self',at:Date.now()};render();return}
-  if(el.id==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;commit(t,x);render();return}
-  if(el.id==='next'){if(S.queue.length){cur=S.queue[0].id;render()}else{cur=null;render()}}
+  const act=el.dataset.act||el.id;
+  if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);
+    /* Switching evidence tabs on phone moves you onto the tools stage */
+    if(isPhone()&&x.tab!=='ticket'&&x.tab!=='notes'&&(mview==='ticket'||mview==='tools')){mview='tools';setMview(mview)}
+    if(isPhone()&&(x.tab==='ticket'||x.tab==='notes')&&mview==='tools'){mview='ticket';setMview(mview)}
+    renderWork();return}
+  if(act==='replay'){S.queue=BANK.map(b=>shuf(clone(b)));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;mview='ticket';save();render();return}
+  if(act==='to-reply'&&t){
+    if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);renderMbar();return}
+    x.err='';x.rstep='reply';mview='resolve';setMview(mview);renderRes(t,x);renderMbar();window.scrollTo(0,0);return}
+  if(act==='to-triage'&&t){x.rstep='triage';mview='resolve';setMview(mview);renderRes(t,x);renderMbar();window.scrollTo(0,0);return}
+  if(act==='submit'&&t){const ta=$('#reply');if(ta)x.reply=ta.value;
+    if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';x.rstep='triage';renderRes(t,x);renderMbar();return}
+    if(x.reply.trim().length<60){x.err='Write a fuller reply to the client.';x.rstep='reply';mview='resolve';setMview(mview);renderRes(t,x);renderMbar();return}
+    x.err='';x.done={parts:parts(t,x),reply:null,fb:null,state:'self',at:Date.now()};mview='score';render();return}
+  if(act==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;commit(t,x);mview='score';render();return}
+  if(act==='next'){if(S.queue.length){cur=S.queue[0].id;w(cur).rstep='triage';mview='ticket';render()}else{cur=null;mview='queue';render()}}
 });
 document.addEventListener('change',e=>{const t=find(cur);if(!t)return;const x=w(t.id),n=e.target.name,v=e.target.value;
   if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
@@ -317,8 +439,10 @@ document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t
     b.hidden=!text;const dt=b.querySelector('.draft-text');if(dt)dt.textContent=text?x.reply:'';
   });
 });
-const tick=setInterval(()=>{const el=$('#timer'),t=find(cur);if(el&&t&&W[t.id]&&!W[t.id].done)el.textContent=fmtT(Date.now()-W[t.id].start)},1000);
+const tick=setInterval(()=>{const t=find(cur);if(!t||!W[t.id]||W[t.id].done)return;const s=fmtT(Date.now()-W[t.id].start);
+  document.querySelectorAll('#timer,#timer-m').forEach(el=>{el.textContent=s})},1000);
+matchMedia('(max-width:760px)').addEventListener('change',()=>render());
 
-render();
+setMview(mview);render();
 }
 </script></body></html>

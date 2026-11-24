@@ -12,7 +12,7 @@ Edit on phone: open https://github.com/alexmciver/service-desk-simulator/edit/ma
 - **Reply marking:** self-mark against eight checks: picked up the buried detail, plain English, professional tone, explains the cause, next steps, billing handled, safe practice, keeps hosting details private.
 - **Tickets:** six built-in scenarios. When the queue is clear, replay them (answers are reshuffled).
 - **Progress:** UK career path with salary bands — First line support (10, £22–28k), Experienced agent (50, £28–35k), Senior / specialist (150, £35–45k), Team lead (400, £45–55k), Head of support (1,000, £55–75k). Title jumps at ticket thresholds; the midpoint within the band drifts with average score and streak. Per-area skill bars and daily streak included.
-- **Phones:** mobile-first layout for iPhone Safari (viewport + safe-area insets, stacked queue / tools / reply, sticky progress that stays clear of the reply box).
+- **Phones:** one-focus screens for iPhone Safari — queue → ticket → tools → triage/reply → score — with a step rail, sticky primary actions, and ticket details tucked behind a sheet. Desktop keeps the three-column workbench.
 
 ## Running locally
 
