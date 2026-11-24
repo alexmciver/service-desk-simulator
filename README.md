@@ -2,7 +2,9 @@
 
 A training simulator for WordPress and Shopify support work. Work through a queue of realistic client tickets: inspect the evidence in tool tabs (Site check, Logs, Admin, Code, DNS & mail), ask the client follow-up questions, triage, diagnose, pick the first fix and write the client reply.
 
-Live version: https://claude.ai/artifact/3B4w4NWJtegPXDxVXTNvKT
+Live version (Safari / phone): https://alexmciver.github.io/service-desk-simulator/
+
+Edit on phone: open https://github.com/alexmciver/service-desk-simulator/edit/main/index.html in Safari, change the file, then **Commit changes**.
 
 ## How it works
 
