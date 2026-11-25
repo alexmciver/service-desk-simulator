@@ -312,28 +312,48 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const clone=o=>JSON.parse(JSON.stringify(o));
 const today=()=>new Date().toLocaleDateString('en-CA');
 function shuf(t){for(const q of ['key','dx','fix']){const right=t[q].opts[t[q].a];const o=t[q].opts.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}t[q].opts=o;t[q].a=o.indexOf(right)}return t}
-function fresh(){return{v:2,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[]}}
-function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={}}
+function fresh(){return{v:3,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[],seenIds:[]}}
+function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.seenIds))S.seenIds=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={};if(S.v<3)S.v=3}
 let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
 if(!S||typeof S!=='object')S=fresh();ensureState();
 if(!Array.isArray(S.queue))S.queue=[];
-/* Migrate: older saves without channel / empty queue get a practice set */
+/* Endless unique tickets: handcrafted bank first, then offline remixes — never re-queue a seen subject/id */
 function bankById(id){return BANK.find(b=>b.id===id)}
 function withChannel(t){if(!t.channel)t.channel='desk';return t}
 function spacedDays(score){return score>=20?7:score>=15?3:1}
-function dueIds(now){const out=[];for(const [id,j] of Object.entries(S.journal||{})){if(j&&j.dueAt&&j.dueAt<=now)out.push({id,dueAt:j.dueAt,score:j.score??0})}return out.sort((a,b)=>a.dueAt-b.dueAt).map(x=>x.id)}
-function buildPractice(limit){limit=limit||6;const now=Date.now();const q=[];const used=new Set();
-  const pushId=id=>{const b=bankById(id);if(!b||used.has(id))return;used.add(id);q.push(shuf(withChannel(clone(b))))};
-  for(const id of dueIds(now)){if(q.length>=limit)break;pushId(id)}
-  const unseen=BANK.filter(b=>!S.seen.includes(b.subject)&&!used.has(b.id));
-  for(const b of unseen){if(q.length>=limit)break;pushId(b.id)}
-  const wk=weakest();const weak=BANK.filter(b=>b.area===wk&&!used.has(b.id));
-  for(const b of weak){if(q.length>=limit)break;pushId(b.id)}
-  const rest=BANK.filter(b=>!used.has(b.id)).sort(()=>Math.random()-.5);
-  for(const b of rest){if(q.length>=limit)break;pushId(b.id)}
-  return q}
+function wasSeen(t){return S.seen.includes(t.subject)||S.seenIds.includes(t.id)||S.queue.some(q=>q.subject===t.subject||q.id===t.id)}
+function markSeen(t){if(!S.seen.includes(t.subject))S.seen.push(t.subject);if(!S.seenIds.includes(t.id))S.seenIds.push(t.id)}
+const CLIENTS=[['Ashford & Co','Priya Nair, Owner'],['Beacon Primary','Tom Hughes, Office Manager'],['Cedar Row Trust','Amira Khan, Comms'],['Driftwood Cafe','Luke Bennett, Manager'],['Elm & Ivy','Sophie Grant, Founder'],['Forge Lane Motors','Dan Okeke, Ops'],['Garden Gate Nursery','Ella Frost, Lead'],['Harbour Lights B&B','Mark Chen, Owner'],['Ironbridge Studio','Nia Owens, Creative'],['Jubilee Hall','Ruth Adeyemi, Coordinator'],['Kite & Loom','Owen Price, Ecommerce'],['Larkspur Clinic','Helen Cho, Practice Manager'],['Millbridge Books','Sam Reid, Owner'],['North Quay Gym','Chris Patel, GM'],['Orchard Deli','Jo Mansell, Owner'],['Pebble & Pine','Sian Blake, Founder'],['Quay Street Gallery','Imogen Lee, Curator'],['Riverbed Apparel','Jordan Miles, Lead'],['Stoneycroft Vet','Rachel Okoro, Manager'],['Tide & Twine','Ben Fraser, Owner'],['Uplands Dental','Carys Evans, Reception'],['Violet Hill Bakery','Alex Ng, Owner'],['Westgate Museum Shop','Pat Doyle, Retail'],['Yarrow Workshops','Kim Osei, Lead']];
+const ROLES=['Owner','Office Manager','Ops Lead','Founder','Comms Officer','Ecommerce Lead','Practice Manager','Retail Lead'];
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function uniqSubject(base,client){let s=base,n=0;while(S.seen.includes(s)||S.queue.some(q=>q.subject===s)){n++;s=n===1?`${base} (${client.split(' ')[0]})`:`${base} · ${client.split(' ')[0]} #${n+1}`;if(n>50){s=base+' · '+Date.now().toString(36);break}}return s}
+function domainFrom(client){return client.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18)+'.co.uk'}
+/* Remix a seed ticket with a new client/subject/id so patterns stay teachable but never repeat */
+function mintTicket(preferArea,preferChannel){const pool=BANK.filter(b=>!preferArea||b.area===preferArea);const seed=pick(pool.length?pool:BANK);
+  const t=shuf(withChannel(clone(seed)));const [client,from0]=pick(CLIENTS);
+  const from=Math.random()<.5?from0:`${pick(['Jo','Sam','Alex','Pat','Chris','Taylor','Morgan'])} ${pick(['Price','Shah','Reid','Hart','Moss','Blake','Lee'])}, ${pick(ROLES)}`;
+  t.id='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  t.client=client;t.from=from;t.channel=preferChannel||seed.channel||pick(['desk','chat','call']);
+  t.subject=uniqSubject(seed.subject.replace(/\s*\(.*?\)\s*$/,'').replace(/\s·.*$/,''),client);
+  const dom=domainFrom(client);t.site=String(t.site||'').replace(/[a-z0-9.-]+\.(co\.uk|com|org\.uk|sch\.uk)/i,dom);
+  if(t.plan&&/Ad-hoc/.test(t.plan)&&Math.random()<.3)t.plan='Ad-hoc · £40/hr';
+  /* Light body personalisation so chat/call openings feel fresh */
+  t.body=String(t.body||'').replace(/\b(Hi Alex|Hello|Morning|hi —|hey —|Alex,)\b/i,t.channel==='chat'?'hi —':t.channel==='call'?'':('Hi,'));
+  if(t.channel==='call'&&!/^\s*$/.test(t.body)){/* keep spoken lines */}
+  t.seed=seed.id;return t}
+function dueAreas(now){const out=[];for(const j of Object.values(S.journal||{})){if(j&&j.dueAt&&j.dueAt<=now&&j.area)out.push({area:j.area,dueAt:j.dueAt,channel:j.channel})}return out.sort((a,b)=>a.dueAt-b.dueAt)}
+function dueCount(){return dueAreas(Date.now()).length}
+function takeUnseenBank(area){const list=BANK.filter(b=>!wasSeen(b)&&(!area||b.area===area));return list.length?shuf(withChannel(clone(pick(list)))):null}
+function nextTicket(preferArea){const area=preferArea||null;const b=takeUnseenBank(area)||takeUnseenBank(null);if(b)return b;return mintTicket(area||weakest())}
+function buildPractice(limit){limit=limit||6;const now=Date.now();const q=[];
+  const push=t=>{if(!t||wasSeen(t)||q.some(x=>x.subject===t.subject||x.id===t.id))return false;q.push(t);return true};
+  for(const d of dueAreas(now)){if(q.length>=limit)break;push(nextTicket(d.area))}
+  const wk=weakest();let tries=0;
+  while(q.length<limit&&tries++<40){const t=nextTicket(q.length%2?wk:null);if(!push(t))push(mintTicket(wk))}
+  return q.slice(0,limit)}
+function refillQueue(min){min=min||3;let guard=0;while(S.queue.length<min&&guard++<20){const t=nextTicket(weakest());if(wasSeen(t)||S.queue.some(q=>q.subject===t.subject)){const m=mintTicket(weakest());if(!wasSeen(m)&&!S.queue.some(q=>q.subject===m.subject))S.queue.push(m)}else S.queue.push(t)}}
 if(!S.queue.length){S.queue=buildPractice(6);try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}}
-else S.queue=S.queue.map(t=>withChannel(t));
+else{S.queue=S.queue.map(t=>withChannel(t));refillQueue(3)}
 let cur=S.queue[0]?.id||null;
 /* Phone path: queue → work → score (desktop ignores this; tools stay as tabs inside work) */
 let mview='queue';
@@ -373,7 +393,6 @@ function fmtBand(c){return c?`£${c[2]}–${c[3]}k`:'—'}
 function areaPct(a){const r=S.areas[a];return r&&r.m?r.s/r.m:null}
 function weakest(){let best=null,bv=2;for(const a of AREAS){const r=S.areas[a];const v=!r||!r.n?-1+Math.random()*.01:r.s/r.m;if(v<bv){bv=v;best=a}}return best}
 function fmtT(ms){const s=Math.floor(ms/1000);return Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s'}
-function dueCount(){return dueIds(Date.now()).length}
 
 function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:0;
   const pct=nx?Math.round((n-prev)/(nx[0]-prev)*100):100;const avg=S.max?Math.round(S.sum/S.max*100):0;
@@ -382,13 +401,13 @@ function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:
   $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>Desk, live chat and phone — practise like a real shift.</p></div>
   <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
   <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${esc(payLine)}${payLine?' · ':''}${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
-  <div class="status">${due?`${due} ticket${due===1?'':'s'} due for spaced practice · `:''}Weakest area: ${esc(weakest())}. Progress saved in this browser.</div>`}
+  <div class="status">Endless unique tickets · ${S.seen.length} done · ${due?`${due} skill area${due===1?'':'s'} due for fresh practice · `:''}Focus: ${esc(weakest())}.</div>`}
 
 function renderQueue(){const open=S.queue;$('#qh').textContent=`Queue · ${open.length} open`;
-  $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear — pull today's practice to keep skills sharp.</p>`;
+  $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear — pull fresh tickets (never repeats).</p>`;
   const due=dueCount();
-  $('#gen').innerHTML=open.length?`<p class="hintline">${due?`${due} due for revisit. `:''}Focus: ${esc(weakest())}.</p>`
-    :`<button class="btn w" id="practice">Today's practice</button><button class="btn ghost w" id="replay">Shuffle full bank</button>`}
+  $('#gen').innerHTML=`<p class="hintline">${due?`${due} weak area${due===1?'':'s'} due — new tickets, same skills. `:''}Focus: ${esc(weakest())}.</p>
+  <button class="btn w" id="practice">${open.length?'Add 3 unique tickets':"Today's practice"}</button>`}
 
 function opt(name,val,label,checked){return `<label class="opt"><input type="radio" name="${name}" value="${esc(val)}" ${checked?'checked':''}><span>${esc(label)}</span></label>`}
 function initials(name){return String(name||'?').split(/[\s,]+/).filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'?'}
@@ -501,7 +520,7 @@ function renderMbar(){const bar=$('#mbar');if(!bar)return;
 
 function renderFoot(){const wk=weakest();const due=dueCount();
   const sk=AREAS.map(a=>{const r=S.areas[a],p=areaPct(a);return `<div class="sk"><span>${esc(a)}</span><div class="bar"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><b>${p==null?'–':Math.round(p*100)+'%'}</b></div>`}).join('');
-  const body=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. ${due?`${due} due for spaced revisit.`:'Practice fills the queue from due, unseen and weak areas.'}</p></div>
+  const body=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Queue never repeats a ticket; fresh ones keep coming for weak areas.</p></div>
   <div><h2>Career path · UK salary</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])} · ${fmtBand(c)}</span><span>${c[0]} tickets</span></li>`).join('')}</ol><p class="hintline">Title jumps at ticket thresholds; the £ midpoint drifts with average score and streak.</p></div>
   <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`;
   $('#foot').innerHTML=`<details class="sheet monly"><summary>Skills, career path and recent tickets</summary><div class="sheet-body foot-inner">${body}</div></details><div class="foot-desk">${body}</div>`}
@@ -524,15 +543,19 @@ function goMview(v){const t=find(cur),x=t&&w(t.id);
   setMview(mview);renderWork();window.scrollTo(0,0)}
 
 function recordJournal(t,tot,misses){const days=spacedDays(tot);const dueAt=Date.now()+days*864e5;
-  S.journal[t.id]={score:tot,misses:misses.map(m=>m.title),dueAt,at:Date.now(),n:((S.journal[t.id]||{}).n||0)+1}}
+  /* Store area/channel only — due practice mints a NEW ticket in that area (never the same subject) */
+  const key=t.area+'|'+(t.channel||'desk');
+  S.journal[key]={score:tot,misses:misses.map(m=>m.title),dueAt,at:Date.now(),area:t.area,channel:t.channel||'desk',n:((S.journal[key]||{}).n||0)+1}}
 
 function finishTicket(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.reply||0);
   S.resolved++;S.sum+=tot;S.max+=25;const r=S.areas[t.area]||(S.areas[t.area]={s:0,m:0,n:0});r.s+=tot;r.m+=25;r.n++;
   const d=today();if(S.lastDay!==d){const y=new Date(Date.now()-864e5).toLocaleDateString('en-CA');S.streak=S.lastDay===y?(S.streak||0)+1:1;S.lastDay=d}
   S.hist.unshift({s:t.subject,a:t.area,g:tot,ch:t.channel||'desk',at:Date.now()});S.hist=S.hist.slice(0,60);
-  S.seen.push(t.subject);S.seen=S.seen.slice(-80);
+  markSeen(t);
   recordJournal(t,tot,x.done.misses||[]);
-  DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);x.done.state='final';save()}
+  DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);
+  refillQueue(3);
+  x.done.state='final';save()}
 
 document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
   if(el.dataset.open){cur=el.dataset.open;w(cur).rstep='triage';mview='work';render();return}
@@ -540,8 +563,8 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,[data-op
   const t=find(cur),x=t&&w(t.id);
   const act=el.dataset.act||el.id;
   if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);renderWork();return}
-  if(act==='practice'){S.queue=buildPractice(6);Object.keys(W).forEach(k=>delete W[k]);Object.keys(DONE).forEach(k=>delete DONE[k]);cur=S.queue[0]?.id||null;mview=cur?'work':'queue';save();render();return}
-  if(act==='replay'){S.queue=BANK.map(b=>shuf(withChannel(clone(b))));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;mview='work';save();render();return}
+  if(act==='practice'){const add=buildPractice(S.queue.length?3:6);for(const t0 of add){if(!S.queue.some(q=>q.id===t0.id||q.subject===t0.subject))S.queue.push(t0)}
+    if(!cur&&S.queue[0])cur=S.queue[0].id;mview=cur?'work':'queue';save();render();return}
   if(act==='to-reply'&&t){
     if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);renderMbar();
       if(isPhone()){const a=$('#resolve-anchor');if(a)a.scrollIntoView({behavior:'smooth',block:'start'})}
@@ -562,7 +585,7 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,[data-op
     if((x.done.misses||[]).length){x.done.state='learn';mview='score';render();return}
     finishTicket(t,x);mview='score';render();return}
   if(act==='gotit'&&t){finishTicket(t,x);mview='score';render();return}
-  if(act==='next'){if(S.queue.length){cur=S.queue[0].id;w(cur).rstep='triage';mview='work';render()}else{cur=null;mview='queue';render()}}
+  if(act==='next'){refillQueue(3);if(S.queue.length){cur=S.queue[0].id;w(cur).rstep='triage';mview='work';render()}else{S.queue=buildPractice(6);cur=S.queue[0]?.id||null;mview=cur?'work':'queue';save();render()}}
 });
 document.addEventListener('change',e=>{const t=find(cur);if(!t)return;const x=w(t.id),n=e.target.name,v=e.target.value;
   if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
