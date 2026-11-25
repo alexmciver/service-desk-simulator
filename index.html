@@ -6,10 +6,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
 <style>
 /* VOICE: a working help desk; calm, exact, a little ceremonial when you earn a certificate.
-   IDEA: a ticketing workbench like Zoho Desk, with SMS client threads and lab-bench evidence drawers.
-   PICTURE: the open ticket and its tool tabs, filling the first screen mid-use.
+   IDEA: a Zoho-style workbench with desk email, live chat and phone-call channels, plus lab-bench evidence drawers.
+   PICTURE: the open contact and its tool tabs, filling the first screen mid-use.
    COLOUR and TYPE: white ground, prussian band and actions, carmine for urgency and misses; Literata throughout.
-   LAYOUT: desktop = queue | messages + tools | resolve; phone = one path (queue → work → score) with sticky ticket context. */
+   LAYOUT: desktop = queue | contact + tools | resolve; phone = queue → work → score with sticky context. */
 :root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
@@ -52,7 +52,17 @@ select,input[type=text],textarea{width:100%;font-size:16px;padding:9px 10px;bord
 .body{white-space:pre-wrap;font-size:17px;max-width:68ch}
 pre.con{background:var(--con);color:var(--cont);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .hintline{font-size:13px;color:var(--mute)}
-/* SMS thread — inbound grey, outbound Prussian; reads like a phone Messages view */
+.chip.ch{border-color:var(--pr);color:var(--pr);font-weight:600}
+.mail{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:14px 16px;max-width:68ch}
+.mail-h{font-size:13px;color:var(--mute);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px;display:grid;gap:4px}
+.mail-h b{color:var(--ink);font-weight:600}
+.call{border:1px solid var(--line);border-radius:12px;background:light-dark(#f0f4f8,#12161d);padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+.call-bar{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--pr)}
+.call-bar .dot{width:8px;height:8px;border-radius:50%;background:#1a7f37;box-shadow:0 0 0 3px rgba(26,127,55,.2)}
+.chatlog{display:grid;gap:8px;margin-bottom:10px}
+.row{display:flex;gap:8px}.row input{flex:1}
+/* Chat/call bubbles — inbound grey, outbound Prussian */
+
 .sms{display:flex;flex-direction:column;gap:8px;padding:14px 12px;border:1px solid var(--line);border-radius:12px;background:
   radial-gradient(120% 80% at 0% 0%,light-dark(#e8eef5,#1a2433) 0%,transparent 55%),
   light-dark(#eef1f5,#12161d);min-height:140px}
@@ -181,12 +191,13 @@ ol,ul{margin:0;padding:0;list-style:none}
 const AREAS=['WordPress core & PHP','Plugins & WooCommerce','Performance & caching','Security & hacked sites','Divi & page builders','Shopify themes & Liquid','Shopify apps & integrations','Shopify admin & checkout','DNS, domains & email'];
 /* UK market bands (£k): title jumps at ticket thresholds; midpoint drifts with score and streak */
 const CERTS=[[10,'First line support',22,28],[50,'Experienced agent',28,35],[150,'Senior / specialist',35,45],[400,'Team lead',45,55],[1000,'Head of support',55,75]];
-const TOOLS=[['ticket','Messages'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail'],['notes','Client notes']];
+const TOOLS=[['ticket','Contact'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail']];
+const CH={desk:'Desk',chat:'Live chat',call:'Phone call'};
 const PRI=['Low','Normal','High','Urgent'];
 const BILL={covered:'Covered by plan',overage:'Covered, but flag overage',adhoc:'Ad-hoc quote'};
 const CHECKS=[['read','Picked up the buried detail'],['plain','Plain, non-technical English'],['tone','Professional and proactive, no emojis'],['why','Explains the cause and why the work matters'],['next','Clear next steps and timing'],['money','Billing handled (plan, overage or £40/hr estimate)'],['safe','Safe practice (staging, backups, testing)'],['conf','Keeps the hosting provider and internals private']];
 const BANK=[
-{id:'b1',desk:'Agency desk',p:'WordPress',area:'Performance & caching',client:'Hollybrook Primary School',from:'Joanne Price, Office Manager',subject:'Term dates not updating on the homepage',plan:'Support retainer · 3 hrs/month · 0.5 used',site:'hollybrookprimary.sch.uk · WordPress 6.8 · Divi',pri:'High',bill:'covered',
+{id:'b1',channel:'desk',desk:'Agency desk',p:'WordPress',area:'Performance & caching',client:'Hollybrook Primary School',from:'Joanne Price, Office Manager',subject:'Term dates not updating on the homepage',plan:'Support retainer · 3 hrs/month · 0.5 used',site:'hollybrookprimary.sch.uk · WordPress 6.8 · Divi',pri:'High',bill:'covered',
 body:"Hi,\n\nI updated the spring term dates on the homepage this morning and pressed Update. When I look at the site it still shows the old dates. Weirdly my colleague Sarah says she can see the new ones on her laptop, but she's logged in too as she's doing the newsletter.\n\nParents keep ringing the office about it so if you could look today that would be great.\n\nThanks,\nJoanne",
 key:{opts:["Sarah sees the new dates while she's logged in","The site is built with Divi","Parents keep ringing the office","Joanne pressed Update this morning"],a:0},
 ev:{site:"GET / (logged out) → 200 OK\nx-litespeed-cache: hit\nage: 31842\nOld term dates shown\n\nGET / (logged in) → 200 OK\nx-litespeed-cache: miss\nNew term dates shown",logs:"No PHP errors in the last 24 hours.",admin:"LiteSpeed Cache 6.5 (active)\n  Public cache TTL: 604800 seconds\n  Purge all on page update: OFF\nDivi 4.27 · Static CSS file generation: on",code:".htaccess contains the standard LiteSpeed block. Nothing custom.",dns:"A record → our managed server. Nothing unusual."},keyTool:'site',
@@ -195,7 +206,7 @@ fix:{opts:["Purge the homepage cache, switch on purge-on-update for pages, then 
 hidden:"Joanne is not technical. She saved the change at about 9:40am. She checks the site logged out on her office PC. Nobody has changed plugins recently.",
 model:"Hi Joanne,\n\nThanks for flagging this. The new term dates are saved correctly; the issue was that the website keeps a stored copy of each page so it loads quickly for parents, and that copy hadn't refreshed after your update. Logged-in staff like Sarah skip the stored copy, which is why she could see the change.\n\nI've cleared the stored copy of the homepage and checked it as a parent would see it, and the new dates are now showing. I've also switched on a setting so the stored copy refreshes automatically whenever a page is updated, so this shouldn't happen again.\n\nThis was covered by your support plan. If you spot anything else, just reply here or raise it through the Help Centre.\n\nKind regards,\nAlex",
 learn:"\"I can see it but others can't\" is almost always caching. Check response headers (x-litespeed-cache, cf-cache-status, age) before you touch the page.",url:"https://docs.litespeedtech.com/lscache/lscwp/cache/"},
-{id:'b2',desk:'Freelance',p:'WordPress',area:'Plugins & WooCommerce',client:'Fenwick & Fold Stationery',from:'Priya Shah, Owner',subject:'Orders stuck on "Pending payment"',plan:'Care plan · 1 hr/month · 0.75 used · ad-hoc £40/hr',site:'fenwickandfold.co.uk · WooCommerce 9 · Stripe',pri:'Urgent',bill:'overage',
+{id:'b2',channel:'call',desk:'Freelance',p:'WordPress',area:'Plugins & WooCommerce',client:'Fenwick & Fold Stationery',from:'Priya Shah, Owner',subject:'Orders stuck on "Pending payment"',plan:'Care plan · 1 hr/month · 0.75 used · ad-hoc £40/hr',site:'fenwickandfold.co.uk · WooCommerce 9 · Stripe',pri:'Urgent',bill:'overage',
 body:"Hi Alex,\n\nSince Tuesday every order is coming through as Pending payment even though customers are being charged. I can see the money in Stripe. I've been changing them to Processing by hand which is a pain.\n\nNot sure if it's related but our marketing guy said we should drop the www, so we switched the domain over to fenwickandfold.co.uk on Monday night.\n\nCan you have a look? Our Black Friday sale starts this week!\n\nPriya",
 key:{opts:["The domain changed from www to non-www on Monday","The Black Friday sale starts this week","The money is reaching Stripe","Priya is updating orders by hand"],a:0},
 ev:{site:"GET https://www.fenwickandfold.co.uk/?wc-api=wc_stripe\n→ 301 Moved Permanently\n→ https://fenwickandfold.co.uk/?wc-api=wc_stripe",logs:"WooCommerce › Status › Logs (stripe)\n  No webhook events received since Mon 23:12\n\nStripe dashboard › Webhooks\n  Endpoint: https://www.fenwickandfold.co.uk/?wc-api=wc_stripe\n  214 failed deliveries (HTTP 301)",admin:"WooCommerce › Payments › Stripe\n  Webhook URL to use: https://fenwickandfold.co.uk/?wc-api=wc_stripe\nSettings › General\n  Site Address: https://fenwickandfold.co.uk",code:"Nothing payment-related in functions.php.",dns:"www CNAME → fenwickandfold.co.uk\nRedirect rule: www → apex (301)"},keyTool:'logs',
@@ -204,7 +215,7 @@ fix:{opts:["Update the webhook endpoint in Stripe, resend the failed events, and
 hidden:"Priya changed the domain on Monday night with her marketing contact. Around 30 orders are affected. She isn't sure who set up Stripe originally but has the login.",
 model:"Hi Priya,\n\nThanks for the detail about the domain change, that was the key. When a customer pays, Stripe sends a confirmation message back to your website, and that's what moves the order to Processing. Stripe was still sending those messages to the old www address, and since Monday they've been bouncing off the redirect, so your site never heard the payment had gone through.\n\nThe fix is to point Stripe at the new address, resend the missed confirmations so the stuck orders update themselves, and then place a test order to prove it's working before your sale. I'd estimate about an hour. You have 15 minutes left on this month's care plan, so the remaining 45 minutes would be billed at £40/hr (£30). If you're happy with that, reply here and I'll get it done today.\n\nUntil then, please don't bulk-change the pending orders, as resending the confirmations will sort them correctly.\n\nBest,\nAlex",
 learn:"Payment gateways confirm orders by webhook. A domain, SSL or redirect change can break them silently, so check the gateway's webhook delivery log first.",url:"https://docs.stripe.com/webhooks"},
-{id:'b3',desk:'Agency desk',p:'WordPress',area:'WordPress core & PHP',client:'Marlowe Community Trust',from:'Daniel Okafor, Comms Officer',subject:'"There has been a critical error on this website"',plan:'Support retainer · 4 hrs/month · 1 used',site:'marlowetrust.org.uk · WordPress 6.8',pri:'Urgent',bill:'covered',
+{id:'b3',channel:'call',desk:'Agency desk',p:'WordPress',area:'WordPress core & PHP',client:'Marlowe Community Trust',from:'Daniel Okafor, Comms Officer',subject:'"There has been a critical error on this website"',plan:'Support retainer · 4 hrs/month · 1 used',site:'marlowetrust.org.uk · WordPress 6.8',pri:'Urgent',bill:'covered',
 body:"Morning,\n\nOur website is just showing 'There has been a critical error on this website' this morning. Nobody here has touched it since last week.\n\nWe did get an email on Friday from your server team saying PHP was being upgraded to 8.3 over the weekend, which I assume was fine?\n\nCould you look urgently? We've got a donation appeal going out at 2pm.\n\nDaniel",
 key:{opts:["PHP was upgraded to 8.3 over the weekend","Nobody has touched the site since last week","A donation appeal goes out at 2pm","It's a charity site"],a:0},
 ev:{site:"GET / → 500 Internal Server Error\nBody: There has been a critical error on this website.",logs:"PHP Fatal error: Uncaught Error: Call to undefined function create_function()\n  in /wp-content/plugins/event-rotator-lite/rotator.php:88",admin:"Recovery mode email sent to admin@marlowetrust.org.uk (Sat 03:02)\nPlugin: Event Rotator Lite 1.2, last updated 2017",code:"wp-config.php: WP_DEBUG false. No must-use plugins.",dns:"Nothing unusual."},keyTool:'logs',
@@ -213,7 +224,7 @@ fix:{opts:["Deactivate the plugin (recovery mode or rename its folder), confirm 
 hidden:"The rotator plugin shows upcoming events on the homepage and they want to keep that feature. Daniel never saw the recovery mode email.",
 model:"Hi Daniel,\n\nThe site is back up. The cause was an old add-on that shows your upcoming events on the homepage. It hasn't been updated since 2017 and isn't compatible with the newer, more secure server software installed at the weekend, so it stopped the whole site loading.\n\nI've switched that add-on off so you're safe for the 2pm appeal. The events strip will be missing from the homepage for now. Next, I'll set up a maintained replacement on our staging copy, check it with you, and then put it live, which I expect to take around an hour within your support plan.\n\nI'll update you here once the staging version is ready to review.\n\nKind regards,\nAlex",
 learn:"\"Critical error\" after a PHP change: read the PHP error log for the plugin path. create_function(), each() and similar were removed in PHP 8.",url:"https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/"},
-{id:'b4',desk:'Freelance',p:'Shopify',area:'Shopify apps & integrations',client:'Kestrel Outdoor',from:'Tom Reid, Ecommerce Lead',subject:'Old popup still showing after removing the app',plan:'Ad-hoc · £40/hr',site:'kestreloutdoor.co.uk · Shopify · Dawn 15 (customised)',pri:'Normal',bill:'adhoc',
+{id:'b4',channel:'chat',desk:'Freelance',p:'Shopify',area:'Shopify apps & integrations',client:'Kestrel Outdoor',from:'Tom Reid, Ecommerce Lead',subject:'Old popup still showing after removing the app',plan:'Ad-hoc · £40/hr',site:'kestreloutdoor.co.uk · Shopify · Dawn 15 (customised)',pri:'Normal',bill:'adhoc',
 body:"Hi Alex,\n\nWe uninstalled the Spinwheel discount app on Friday as we've moved to Klaviyo forms. The old wheel popup is still showing on the homepage, but only on our live theme. On the new theme I'm drafting for January it doesn't show at all.\n\nIt's slowing the page down too. PageSpeed flagged a script from spinwheel-cdn.\n\nCan you remove it? How long will it take?\n\nTom",
 key:{opts:["It shows on the live theme but not the draft theme","They've moved to Klaviyo forms","The app was uninstalled on Friday","PageSpeed flagged a script"],a:0},
 ev:{site:"Console: GET https://spinwheel-cdn.example/wheel.js 200 (from theme.liquid)\nLighthouse: Reduce unused JavaScript, wheel.js 182 KB",logs:"Apps › Uninstalled: Spinwheel Discounts (Fri)\nScript tags via Admin API: none remaining",admin:"Themes: 'Kestrel Live' (published, last edited 2022)\n        'January redesign' (draft, fresh Dawn install)",code:"layout/theme.liquid, line 214:\n{% render 'spinwheel-loader' %}\n<script src=\"https://spinwheel-cdn.example/wheel.js\" defer><\/script>\n\nsnippets/spinwheel-loader.liquid exists",dns:"Nothing relevant."},keyTool:'code',
@@ -222,7 +233,7 @@ fix:{opts:["Duplicate the live theme, remove the render tag, script and snippet,
 hidden:"Tom wants it gone before Thursday's newsletter. The live theme was set up by a previous agency. He'd like a fixed price if possible.",
 model:"Hi Tom,\n\nThe popup is still there because the app's code was added directly into your live theme's files when it was installed, and uninstalling the app doesn't clean that up. Your January theme is a fresh copy, which is why it's not affected.\n\nI'll make a copy of the live theme, remove the leftover code there, check the homepage and run PageSpeed again, then publish it so nothing breaks for shoppers in the meantime. I'll also check for any other leftovers from the previous agency while I'm in there.\n\nThis should take about 45 minutes, so £30 at my £40/hr rate. I can have it done before Thursday's newsletter if you're happy to go ahead.\n\nBest,\nAlex",
 learn:"Older apps injected code into theme files and uninstalling doesn't remove it. Modern apps use theme app extensions. Search the theme code for leftovers and work on a duplicate.",url:"https://shopify.dev/docs/apps/build/online-store/theme-app-extensions"},
-{id:'b5',desk:'Agency desk',p:'Shopify',area:'Shopify admin & checkout',client:'Bramble & Bee',from:'Lucy Hart, Founder',subject:'Discount code not working for some customers',plan:'Support retainer · 2 hrs/month · 0.5 used',site:'brambleandbee.com · Shopify',pri:'High',bill:'covered',
+{id:'b5',channel:'desk',desk:'Agency desk',p:'Shopify',area:'Shopify admin & checkout',client:'Bramble & Bee',from:'Lucy Hart, Founder',subject:'Discount code not working for some customers',plan:'Support retainer · 2 hrs/month · 0.5 used',site:'brambleandbee.com · Shopify',pri:'High',bill:'covered',
 body:"Hello,\n\nWe sent the WINTER15 code out in our newsletter yesterday. It works when I test it, but we've had about ten emails from customers saying the code can't be used.\n\nLooking at their screenshots, they all seem to have something from the Sale collection in their basket, if that helps. We also have the 'Sale 20% off' automatic discount running this week.\n\nThanks,\nLucy",
 key:{opts:["Customers with Sale items are also getting the automatic 20% discount","Lucy tested it and it worked","About ten customers emailed","The code went out in yesterday's newsletter"],a:0},
 ev:{site:"Test checkout: Sale item + WINTER15\n→ \"This discount code couldn't be used with your existing discounts\"",logs:"Nothing relevant.",admin:"Discounts › WINTER15: 15% off order · Combinations: none\nDiscounts › Sale 20% off (automatic): product discount, Sale collection · Combinations: none",code:"Nothing relevant. Checkout isn't customisable on this plan.",dns:"Nothing relevant."},keyTool:'admin',
@@ -231,7 +242,7 @@ fix:{opts:["Check with Lucy whether they should stack; if yes, allow combination
 hidden:"Lucy is happy for them to stack this week only. Margins on sale items are tight.",
 model:"Hi Lucy,\n\nThanks for spotting the Sale pattern, that's exactly it. Shopify won't let two discounts apply to the same order unless both are set to allow it. Customers with Sale items already get the automatic 20% off, so WINTER15 is being blocked. Your test basket didn't include a Sale item, which is why it worked for you.\n\nBefore I change anything: allowing them to combine means a Sale item could end up with both discounts. Would you like that for this week, or would you prefer WINTER15 to apply only to full-price items?\n\nOnce you confirm, it's about 15 minutes to update and test, covered by your support plan. I can also draft a short reply for the customers who emailed.\n\nKind regards,\nAlex",
 learn:"\"Works for me\" usually means your test is different from the customer's. Recreate their exact basket. Discount combinations are set per discount.",url:"https://help.shopify.com/en/manual/discounts/combining-discounts"},
-{id:'b6',desk:'Freelance',p:'Shopify',area:'DNS, domains & email',client:'Oak & Ember Candles',from:'Rachel Moss, Owner',subject:'New domain sometimes shows a parked page',plan:'Launch package · go-live support included',site:'oakandember.co.uk · Shopify',pri:'High',bill:'covered',
+{id:'b6',channel:'chat',desk:'Freelance',p:'Shopify',area:'DNS, domains & email',client:'Oak & Ember Candles',from:'Rachel Moss, Owner',subject:'New domain sometimes shows a parked page',plan:'Launch package · go-live support included',site:'oakandember.co.uk · Shopify',pri:'High',bill:'covered',
 body:"Hi Alex,\n\nI followed the Shopify steps and added the A record 23.227.38.65 at my domain company yesterday afternoon. I didn't delete anything as I wasn't sure what the other records did.\n\nSometimes the shop loads and sometimes I get the old 'this domain is parked' page. Is it just still updating?\n\nWe're announcing the launch on Instagram tomorrow morning.\n\nRachel",
 key:{opts:["She didn't delete any of the existing records","She's announcing on Instagram tomorrow","She added the record yesterday afternoon","She followed Shopify's steps"],a:0},
 ev:{site:"10 requests to oakandember.co.uk:\n  6 × Shopify storefront\n  4 × 'This domain is parked'",logs:"Shopify › Domains: oakandember.co.uk\n  Connection issue: additional A records found",admin:"Shopify › Domains: primary domain pending verification",code:"Nothing relevant.",dns:"oakandember.co.uk   A      23.227.38.65\noakandember.co.uk   A      185.53.177.20   (registrar parking)\nwww                 CNAME  parking.registrar-host.net"},keyTool:'dns',
@@ -240,37 +251,112 @@ fix:{opts:["Remove the parking A record, point www at shops.myshopify.com, verif
 hidden:"Rachel's domain is with a UK budget registrar. She can share a login or screenshots. There's no email on the domain yet.",
 model:"Hi Rachel,\n\nYou did the right thing adding that record. The issue is that the domain company's original 'parked' record is still there alongside it, so visitors are randomly sent to either your shop or the parked page. That's why it works some of the time, and waiting won't fix it.\n\nTwo small changes are needed: remove the old parked record, and point the www version of your address at Shopify too. If you can share access to your domain account, or a screenshot of the records page, I'll make the changes, check them with a lookup tool and confirm everything in Shopify.\n\nThis is covered by your launch package, and once the changes are made it usually settles within an hour or two, so you'll be fine for tomorrow morning.\n\nBest,\nAlex",
 learn:"\"Sometimes it works\" points to duplicate records, not propagation. Check every record on the name, not just the one you added.",url:"https://help.shopify.com/en/manual/domains/add-a-domain/connecting-domains/connect-domain-manual"}
+,{id:'b7',channel:'desk',desk:'Agency desk',p:'WordPress',area:'Security & hacked sites',client:'Northgate Veterinary Clinic',from:'Helen Quayle, Practice Manager',subject:'Homepage redirects to a weird pharmacy site',plan:'Support retainer · 3 hrs/month · 1 used',site:'northgatevets.co.uk · WordPress 6.7',pri:'Urgent',bill:'covered',
+body:"Alex,\n\nSome clients are saying our website sends them to a Chinese pharmacy page. When I look on my phone it looks fine. One of the nurses sent a screenshot and it is definitely our domain in the address bar before it jumps.\n\nWe haven't changed anything. Please treat this as urgent — people think we've been hacked.\n\nHelen",
+key:{opts:["Visitors see a redirect to a pharmacy site while Helen's phone looks fine","They haven't changed anything","Nurses are worried","It's a veterinary clinic"],a:0},
+ev:{site:"GET / (incognito) → 302 → hxxp://spam-pharma.example/sale\nGET / (logged-in admin cookie) → 200 OK clinic homepage",logs:"Access log: many GETs for /wp-content/uploads/2024/07/cache.php\nMalware scan: suspicious PHP in uploads",admin:"Wordfence: 1 critical — backdoor in uploads/cache.php\nUsers: admin + helen + a user 'wp_support' created 2 nights ago",code:"uploads/2024/07/cache.php — obfuscated eval() payload\n.htaccess has an injected RewriteRule at the top",dns:"Nothing unusual."},keyTool:'logs',
+dx:{opts:["A backdoor in uploads is redirecting logged-out visitors","DNS was hijacked","The theme licence expired","Cloudflare is misconfigured"],a:0,why:"Admin sessions skip the injected redirect. The uploads PHP and new user are classic compromise signs."},
+fix:{opts:["Take the site to maintenance, remove the backdoor and rogue user, reset passwords, restore clean files from a known backup on staging first, then harden uploads","Only delete cache.php and republish","Change the domain nameservers","Ignore it if Helen's phone looks fine"],a:0,why:"One file delete leaves other footholds. Clean restore plus credential reset is the safe path."},
+hidden:"Helen uses the same password on a few sites. The 'wp_support' user was not created by anyone at the clinic. They have yesterday's backup.",
+model:"Hi Helen,\n\nYou're right to treat this as urgent — the site has been compromised. Logged-out visitors were being redirected by malicious code hidden in the uploads folder; that's why it looked fine on your phone if you were still logged in.\n\nI've put the site into maintenance, removed the backdoor and a rogue admin user we didn't create, reset the admin passwords, and I'm restoring clean files from yesterday's backup on staging before putting them live. I'll also block PHP execution in uploads so this route is harder next time.\n\nThis is covered by your retainer for the emergency work today. I'll confirm once the clean homepage is live and send a short checklist for password hygiene.\n\nKind regards,\nAlex",
+learn:"\"Fine for me, broken for clients\" on WordPress often means an admin cookie hiding a logged-out redirect malware. Check incognito and the uploads directory.",url:"https://wordpress.org/documentation/article/faq-my-site-was-hacked/"}
+,{id:'b8',channel:'chat',desk:'Freelance',p:'WordPress',area:'Divi & page builders',client:'Harbour View B&B',from:'Mark Ellison, Owner',subject:'Mobile menu covers the Book Now button',plan:'Ad-hoc · £40/hr',site:'harbourviewbb.co.uk · Divi',pri:'Normal',bill:'adhoc',
+body:"hi — on my phone the hamburger menu opens fine but the Book Now button at the top is underneath it and I can't tap it. desktop is ok. can you fix? guests keep emailing me instead of booking",
+key:{opts:["On mobile the open menu covers the Book Now button","Desktop is fine","Guests email instead of booking","It uses Divi"],a:0},
+ev:{site:"iPhone SE width: .et_mobile_nav_menu z-index 99999\n#book-now-bar position:fixed; z-index:20\nMenu open → bar not clickable",logs:"Nothing relevant.",admin:"Divi → Theme Options → Mobile: hamburger enabled\nPlugin: sticky header bar (custom)",code:"style.css custom:\n#book-now-bar{position:fixed;top:0;z-index:20}",dns:"Nothing relevant."},keyTool:'code',
+dx:{opts:["The sticky Book Now bar sits under the mobile menu because its z-index is lower","The Book Now plugin is broken","Safari zoom is wrong","DNS is slow on mobile"],a:0,why:"Fixed stacking context: mobile nav is far above the custom bar."},
+fix:{opts:["Raise the Book Now bar above the menu on mobile or hide it while the menu is open, test on a real phone, then deploy","Rebuild the header in Divi from scratch","Ask guests to use desktop","Remove the hamburger menu"],a:0,why:"A small stacking fix preserves both booking and navigation."},
+hidden:"Mark only checks on an iPhone 12. He wants a fixed price under an hour if possible.",
+model:"Hi Mark,\n\nOn a phone the menu was sitting on top of your Book Now bar, so the button was there but not tappable. Desktop was fine because that menu doesn't use the same overlay.\n\nI'll adjust the stacking so Book Now stays usable when the menu is open, check it on a narrow phone width, then put it live. About 30 minutes — £20 at £40/hr. Reply yes and I'll do it today.\n\nBest,\nAlex",
+learn:"Mobile 'can't tap' bugs are often z-index stacking, not missing elements. Compare overlays in phone width before rewriting the header.",url:"https://www.elegantthemes.com/documentation/divi/"}
+,{id:'b9',channel:'call',desk:'Agency desk',p:'Shopify',area:'Shopify themes & Liquid',client:'Wool & Willow',from:'Sian Parry, Ops',subject:'Collection page shows raw Liquid on one filter',plan:'Support retainer · 2 hrs/month · 0.25 used',site:'woolandwillow.co.uk · Shopify · Horizon',pri:'High',bill:'covered',
+body:"We've got customers screenshotting the collection page and it literally says {{ product.price }} on the blue filter chip when they pick Midweight. Other filters are fine. Started after our developer pushed a theme update last night.",
+key:{opts:["One filter chip shows raw {{ product.price }} after a theme update","Other filters are fine","Customers are screenshotting it","It started last night"],a:0},
+ev:{site:"Collection /collections/yarns?filter.p.m.custom.weight=midweight\nChip label renders: {{ product.price }}",logs:"Theme deploy: Horizon copy 'winter-filters' published 22:14",admin:"Themes: winter-filters (live)\nMarkets: UK only",code:"snippets/filter-pill.liquid line 18:\n{{ filter_value.label | default: '{{ product.price }}' }}\n(accidental string default from a merge conflict)",dns:"Nothing relevant."},keyTool:'code',
+dx:{opts:["A merge conflict left a Liquid example string as the filter label default","Shopify is down","The Midweight metafield was deleted","CDN cache is stale"],a:0,why:"The default filter string is the literal broken output; other filters supply real labels."},
+fix:{opts:["Fix the snippet on a duplicate theme, preview the Midweight filter, publish, and hard-refresh the collection","Roll back the whole theme without checking","Ask customers to ignore it","Delete the Midweight filter"],a:0,why:"Duplicate-theme fix avoids a bad rollback and proves the chip before publish."},
+hidden:"Sian can approve a theme publish. The developer is offline until Thursday.",
+model:"Hi Sian,\n\nThanks for the call. The Midweight chip was printing a leftover bit of template code from last night's theme update — not a Shopify outage. Other filters were fine because they already had proper labels.\n\nI'll fix it on a copy of the live theme, preview the Midweight filter, then publish. About 20 minutes, covered by your retainer. I'll text you when the collection looks clean.\n\nKind regards,\nAlex",
+learn:"Raw {{ ... }} in the storefront almost always means a quoted Liquid string or a failed output. Search the theme for the exact characters customers see.",url:"https://shopify.dev/docs/api/liquid"}
+,{id:'b10',channel:'desk',desk:'Freelance',p:'Shopify',area:'Shopify apps & integrations',client:'Parcel & Pine',from:'Owen Blake, Founder',subject:'Klaviyo back-in-stock emails stopped',plan:'Care plan · 2 hrs/month · 1.5 used · overage £40/hr',site:'parcelandpine.com · Shopify',pri:'High',bill:'overage',
+body:"Hi Alex,\n\nWe haven't had a back-in-stock email go out since we moved themes on Friday. Klaviyo shows the flow is live. Stock is coming back in daily and people are still signing up on the product page.\n\nCan you see what's wrong? We're over hours this month so flag the cost please.\n\nOwen",
+key:{opts:["Back-in-stock emails stopped after a theme move on Friday","Klaviyo flow still shows live","People can still sign up on the product page","They're over plan hours"],a:0},
+ev:{site:"Product page: back-in-stock form renders\nNetwork: POST to Klaviyo BIS endpoint 200",logs:"Klaviyo › Back in stock: last event Friday 16:02\nShopify flow: inventory_level updated events OK",admin:"Klaviyo app: connected\nTheme app embeds: Back in stock embed OFF on live theme",code:"No custom BIS snippet in theme.liquid",dns:"Nothing relevant."},keyTool:'admin',
+dx:{opts:["The Klaviyo back-in-stock theme embed was left off after the theme switch","Klaviyo API keys were revoked","MX records are wrong","Customers aren't really signing up"],a:0,why:"Sign-up POSTs can still work from a cached snippet while the embed that ties inventory events is disabled on the new theme."},
+fix:{opts:["Enable the Klaviyo embed on the live theme, trigger a test restock, confirm the flow receives the event, then watch one real product","Rebuild the flow from scratch","Move back to the old theme permanently","Ask customers to email instead"],a:0,why:"Embed on + test restock proves the pipe without a risky theme rollback."},
+hidden:"Owen can turn embeds on himself if talked through it. He'd rather we do it. About 30 minutes of overage is fine.",
+model:"Hi Owen,\n\nThe sign-up form was still posting, but after Friday's theme switch the Klaviyo back-in-stock embed on the live theme was off, so restock events never reached your flow.\n\nI'll switch the embed on, run a test restock, and confirm Klaviyo receives it. About 30 minutes — you're over the care plan, so that would be £20 at £40/hr. Say the word and I'll do it today.\n\nBest,\nAlex",
+learn:"After a theme switch, re-check theme app embeds. A flow can show Live while its storefront embed is off.",url:"https://help.klaviyo.com/hc/en-us/articles/115005080347"}
+,{id:'b11',channel:'call',desk:'Agency desk',p:'WordPress',area:'Plugins & WooCommerce',client:'Cedar Hall Museum Shop',from:'Imogen Rees, Retail Lead',subject:'Sale prices show ex-VAT to the public',plan:'Support retainer · 4 hrs/month · 2 used',site:'shop.cedarhallmuseum.org.uk · WooCommerce',pri:'High',bill:'covered',
+body:"Visitors are seeing £20 where it should be £24 including VAT on sale items. Members' checkout looks right when we test logged in as staff. Gift Aid pages are unaffected. We need this correct before the weekend family event.",
+key:{opts:["Public sale prices look ex-VAT while staff checkout looks right","Gift Aid pages are fine","Weekend event deadline","Logged-in staff see the correct figure"],a:0},
+ev:{site:"Logged out: .price HTML £20.00\nLogged in shop manager: £24.00 incl. VAT",logs:"Nothing relevant.",admin:"WooCommerce › Tax: prices entered excl. VAT, display shop incl. VAT\nRole-based pricing plugin: 'Staff preview' forces ex-VAT display for administrators — also applying to a 'customer' session cookie remnant",code:"Nothing custom in the theme price template.",dns:"Nothing relevant."},keyTool:'admin',
+dx:{opts:["A staff pricing preview mode is leaking ex-VAT display into some customer sessions","VAT rates were deleted","Stripe is converting currency","The theme hard-codes £20"],a:0,why:"Tax settings say incl. VAT in shop; the role preview plugin is overriding display for some sessions."},
+fix:{opts:["Turn off staff preview for non-admin roles, clear conflicting cookies, confirm logged-out sale price shows £24 incl. VAT","Raise all sale prices by 20% manually","Disable tax entirely","Wait until after the event"],a:0,why:"Fixing display rules restores correct VAT without corrupting catalogue prices."},
+hidden:"Imogen is not an administrator. A contractor installed the role-pricing plugin last month.",
+model:"Hi Imogen,\n\nThanks for ringing. The catalogue prices are fine — a staff preview tool was forcing some visitors to see amounts without VAT, which is why your team checkout looked right and the public didn't.\n\nI'll switch that preview off for customers, check a logged-out sale product shows £24 including VAT, and confirm before the weekend event. Covered by your retainer; should be under half an hour.\n\nKind regards,\nAlex",
+learn:"When staff and public see different prices, dig into role/session display plugins before changing VAT rates.",url:"https://woocommerce.com/document/setting-up-taxes-in-woocommerce/"}
+,{id:'b12',channel:'chat',desk:'Freelance',p:'Shopify',area:'DNS, domains & email',client:'Little Beam Studio',from:'Nia Gethin, Owner',subject:'Transactional email going to spam since Google Workspace move',plan:'Ad-hoc · £40/hr',site:'littlebeam.studio · Shopify',pri:'Normal',bill:'adhoc',
+body:"hey — customers say order confirmations land in spam since we moved email to Google Workspace on Monday. SPF maybe? I added the shopify includes but i'm guessing. can you check?",
+key:{opts:["Order email hits spam since the Google Workspace move on Monday","She tried adding Shopify SPF includes","Customers still get the mail, but in spam","It's transactional order mail"],a:0},
+ev:{site:"Nothing relevant.",logs:"Shopify › Notifications: delivered\nGmail header: spf=fail smtp.mailfrom=shops.shopify.com",admin:"Domains › littlebeam.studio: Shopify email sender not verified",code:"Nothing relevant.",dns:"TXT @ \"v=spf1 include:_spf.google.com ~all\"\n(missing include:shops.shopify.com)\nDKIM: google._domainkey present; Shopify DKIM CNAME missing"},keyTool:'dns',
+dx:{opts:["SPF was replaced with Google-only and no longer allows Shopify to send, so Gmail fails SPF","The theme breaks emails","Customers are marking spam for fun","MX points at the wrong host"],a:0,why:"A single SPF record must include every sender. Google's include alone makes Shopify fail."},
+fix:{opts:["Merge SPF to include Google and Shopify, add Shopify DKIM CNAMEs, verify the sender in Shopify, send a test order","Remove Google SPF and hope","Switch all mail to Shopify only","Ask customers to whitelist one by one"],a:0,why:"Correct SPF+DKIM restores authentication without abandoning Workspace."},
+hidden:"Nia can edit DNS at Cloudflare. She wants this under an hour.",
+model:"Hi Nia,\n\nOrder mail is still sending, but since Monday's Google move your SPF record only allows Google — not Shopify — so Gmail treats it as suspicious. That matches the spam folder reports.\n\nI'll update SPF to allow both, add Shopify's DKIM records, verify the sender, and place a test order. About 45 minutes at £40/hr (£30). Send Cloudflare access (or stay on a call) and I'll sort it.\n\nBest,\nAlex",
+learn:"One SPF TXT per name: merge includes for every sender. Replacing Google with Shopify or the reverse causes silent spf=fail.",url:"https://help.shopify.com/en/manual/ordering-shipping/email-notifications/email-authentication-spf-dkim"}
+
 ];
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const today=()=>new Date().toLocaleDateString('en-CA');
 function shuf(t){for(const q of ['key','dx','fix']){const right=t[q].opts[t[q].a];const o=t[q].opts.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}t[q].opts=o;t[q].a=o.indexOf(right)}return t}
-function fresh(){return{v:1,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],queue:BANK.map(t=>shuf(clone(t))),seen:[]}}
+function fresh(){return{v:2,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[]}}
+function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={}}
 let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
-if(!S||!Array.isArray(S.queue))S=fresh();
+if(!S||typeof S!=='object')S=fresh();ensureState();
+if(!Array.isArray(S.queue))S.queue=[];
+/* Migrate: older saves without channel / empty queue get a practice set */
+function bankById(id){return BANK.find(b=>b.id===id)}
+function withChannel(t){if(!t.channel)t.channel='desk';return t}
+function spacedDays(score){return score>=20?7:score>=15?3:1}
+function dueIds(now){const out=[];for(const [id,j] of Object.entries(S.journal||{})){if(j&&j.dueAt&&j.dueAt<=now)out.push({id,dueAt:j.dueAt,score:j.score??0})}return out.sort((a,b)=>a.dueAt-b.dueAt).map(x=>x.id)}
+function buildPractice(limit){limit=limit||6;const now=Date.now();const q=[];const used=new Set();
+  const pushId=id=>{const b=bankById(id);if(!b||used.has(id))return;used.add(id);q.push(shuf(withChannel(clone(b))))};
+  for(const id of dueIds(now)){if(q.length>=limit)break;pushId(id)}
+  const unseen=BANK.filter(b=>!S.seen.includes(b.subject)&&!used.has(b.id));
+  for(const b of unseen){if(q.length>=limit)break;pushId(b.id)}
+  const wk=weakest();const weak=BANK.filter(b=>b.area===wk&&!used.has(b.id));
+  for(const b of weak){if(q.length>=limit)break;pushId(b.id)}
+  const rest=BANK.filter(b=>!used.has(b.id)).sort(()=>Math.random()-.5);
+  for(const b of rest){if(q.length>=limit)break;pushId(b.id)}
+  return q}
+if(!S.queue.length){S.queue=buildPractice(6);try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}}
+else S.queue=S.queue.map(t=>withChannel(t));
 let cur=S.queue[0]?.id||null;
 /* Phone path: queue → work → score (desktop ignores this; tools stay as tabs inside work) */
 let mview='queue';
 const W={},DONE={};
-function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',start:Date.now(),done:null,err:''})}
+function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',chat:[],q:'',start:Date.now(),done:null,err:''})}
 function find(id){return S.queue.find(t=>t.id===id)||DONE[id]}
 function isPhone(){return matchMedia('(max-width:760px)').matches}
 function setMview(v){mview=v;document.body.dataset.mview=v;
   const x=cur&&W[cur];document.body.dataset.rstep=(v==='work'&&x&&!x.done&&x.rstep)?x.rstep:'';
   const bar=$('#mbar');if(bar)bar.hidden=!isPhone()||v==='queue'}
-/* Prefer the first real sentence, not a greeting bubble like "Hi," */
+function contactLabel(t){return({desk:'Ticket',chat:'Live chat',call:'Call'})[t.channel||'desk']||'Ticket'}
+function replyLegend(t,who){return({desk:`Email ${who} back`,chat:`Send chat reply to ${who}`,call:`Write ${who} a wrap-up note`})[t.channel||'desk']}
+/* Prefer the first real sentence, not a greeting */
 function ctxSnip(t){const greet=/^(hi|hello|hey|hiya|morning|good morning|afternoon|evening)\b[\s,.!]*/i;
   let s='';for(const p of smsParts(t.body)){const n=p.replace(/\s+/g,' ').trim().replace(greet,'').trim();if(n.length>=24){s=n;break}}
   if(!s)s=String(t.body||'').replace(/\s+/g,' ').replace(greet,'').trim();
   return s.length>110?s.slice(0,109).replace(/\s+\S*$/,'')+'…':s}
-/* Sticky strip so tools/SMS/resolve never force the ticket into memory */
 function mctxHTML(t){if(!t)return '';
   const who=t.from.split(',')[0];const x=W[t.id];
-  const snip=ctxSnip(t);
+  const snip=ctxSnip(t);const ch=CH[t.channel||'desk']||'Desk';
   return `<aside class="mctx" aria-label="Ticket context"><div class="mctx-nav"><button type="button" data-mview="queue">← Queue</button><span class="hintline" id="timer-m">${fmtT((x?.done?x.done.at:Date.now())-(x?.start||Date.now()))}</span></div>
   <p class="mctx-sub">${esc(t.subject)}</p>
-  <p class="mctx-line"><span class="pri-${esc(t.pri)}">${esc(t.pri)}</span><span>${esc(t.client)}</span><span>${esc(t.p)}</span></p>
+  <p class="mctx-line"><span class="pri-${esc(t.pri)}">${esc(t.pri)}</span><span>${esc(ch)}</span><span>${esc(t.client)}</span><span>${esc(t.p)}</span></p>
   <p class="mctx-plan">${esc(t.plan)}</p>
   <p class="mctx-snip">${esc(who)}: “${esc(snip)}”</p></aside>`}
 function renderCtx(){const el=$('#ctx');if(!el)return;
@@ -287,44 +373,60 @@ function fmtBand(c){return c?`£${c[2]}–${c[3]}k`:'—'}
 function areaPct(a){const r=S.areas[a];return r&&r.m?r.s/r.m:null}
 function weakest(){let best=null,bv=2;for(const a of AREAS){const r=S.areas[a];const v=!r||!r.n?-1+Math.random()*.01:r.s/r.m;if(v<bv){bv=v;best=a}}return best}
 function fmtT(ms){const s=Math.floor(ms/1000);return Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s'}
+function dueCount(){return dueIds(Date.now()).length}
 
 function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:0;
   const pct=nx?Math.round((n-prev)/(nx[0]-prev)*100):100;const avg=S.max?Math.round(S.sum/S.max*100):0;
   const pay=salaryMid(c);const payLine=c?`~£${pay}k · ${fmtBand(c)} UK`:(nx?`Aiming for ${fmtBand(nx)} UK`:'');
-  $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>WordPress and Shopify support tickets, worked like the real thing.</p></div>
+  const due=dueCount();
+  $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>Desk, live chat and phone — practise like a real shift.</p></div>
   <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
   <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${esc(payLine)}${payLine?' · ':''}${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
-  <div class="status">Built-in tickets with self-marking. Progress is saved in this browser.</div>`}
+  <div class="status">${due?`${due} ticket${due===1?'':'s'} due for spaced practice · `:''}Weakest area: ${esc(weakest())}. Progress saved in this browser.</div>`}
 
 function renderQueue(){const open=S.queue;$('#qh').textContent=`Queue · ${open.length} open`;
-  $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear.</p>`;
-  $('#gen').innerHTML=open.length?'':`<button class="btn ghost w" id="replay">Replay built-in tickets</button>`}
+  $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear — pull today's practice to keep skills sharp.</p>`;
+  const due=dueCount();
+  $('#gen').innerHTML=open.length?`<p class="hintline">${due?`${due} due for revisit. `:''}Focus: ${esc(weakest())}.</p>`
+    :`<button class="btn w" id="practice">Today's practice</button><button class="btn ghost w" id="replay">Shuffle full bank</button>`}
 
 function opt(name,val,label,checked){return `<label class="opt"><input type="radio" name="${name}" value="${esc(val)}" ${checked?'checked':''}><span>${esc(label)}</span></label>`}
 function initials(name){return String(name||'?').split(/[\s,]+/).filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'?'}
-/* Split client email-style body into short SMS-sized bubbles */
 function smsParts(text){return String(text||'').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean)}
-function smsHead(t){const who=t.from.split(',')[0];return `<div class="sms-head"><div class="sms-av" aria-hidden="true">${esc(initials(who))}</div><div class="sms-who">${esc(who)}<span>${esc(t.client)} · Text</span></div></div>`}
-function smsThread(t,x,opts){const who=t.from.split(',')[0];const parts=smsParts(t.body);
-  const inBubbles=parts.map((p,i)=>`<div class="bubble in">${esc(p)}${i===parts.length-1?`<span class="meta-t">${esc(who)}</span>`:''}</div>`).join('');
-  const has=!!x.reply.trim();
-  const draft=`<div class="bubble out"${has?'':' hidden'} data-draft><span class="draft-text">${has?esc(x.reply):''}</span><span class="meta-t">You · draft</span></div>`;
-  const notes=opts?.notes?`<div class="bubble in">${esc(t.hidden||'Nothing further from the client.')}<span class="meta-t">${esc(who)} · if asked</span></div>`:'';
-  return `<div class="sms" role="log" aria-label="Text thread with ${esc(who)}">${smsHead(t)}${inBubbles}${notes}${draft}</div>`}
+function threadHead(t,label){const who=t.from.split(',')[0];return `<div class="sms-head"><div class="sms-av" aria-hidden="true">${esc(initials(who))}</div><div class="sms-who">${esc(who)}<span>${esc(t.client)} · ${esc(label)}</span></div></div>`}
+/* Offline scripted client answers from hidden facts + simple keywords */
+function scriptReply(t,q){const bits=String(t.hidden||'').split(/[.!?]+/).map(s=>s.trim()).filter(s=>s.length>8);
+  const ql=q.toLowerCase();
+  let best=null,score=0;
+  for(const b of bits){const words=b.toLowerCase().split(/[^a-z0-9£]+/).filter(w=>w.length>3);let s=0;for(const w of words){if(ql.includes(w))s++}if(s>score){score=s;best=b}}
+  if(score>=1&&best)return best+(/[.!?]$/.test(best)?'':'.');
+  if(/when|time|what time|morning|night|monday|friday|weekend/.test(ql)){const b=bits.find(x=>/\d|am|pm|morning|night|monday|friday|weekend|yesterday|Thursday/i.test(x));if(b)return b+(/[.!?]$/.test(b)?'':'.')}
+  if(/password|login|access|screenshot|dns|cloudflare/.test(ql)){const b=bits.find(x=>/password|login|access|screenshot|dns|Cloudflare|approve|himself|herself/i.test(x));if(b)return b+(/[.!?]$/.test(b)?'':'.')}
+  return"I'm not sure beyond what I already said — happy to send a screenshot if that helps."}
+function ensureChat(t,x){if(x.chat.length)return;const who=t.from.split(',')[0];
+  for(const p of smsParts(t.body))x.chat.push({r:'cl',t:p});
+  if(t.channel==='call')x.chat.push({r:'cl',t:`(On the phone) ${who} is waiting — ask anything they'd know.`})}
+function contactPane(t,x){const who=t.from.split(',')[0];const ch=t.channel||'desk';
+  if(ch==='desk')return `<div class="mail"><div class="mail-h"><div><span>From </span><b>${esc(t.from)}</b></div><div><span>Subject </span><b>${esc(t.subject)}</b></div><div><span>Channel </span><b>Desk · email</b></div></div><div class="body">${esc(t.body)}</div></div><p class="hintline">Read the email, then check the evidence tools before you triage.</p>`;
+  ensureChat(t,x);
+  const label=ch==='call'?'Phone':'Live chat';
+  const log=x.chat.map(m=>`<div class="bubble ${m.r==='me'?'out':'in'}">${esc(m.t)}${m.r==='cl'?`<span class="meta-t">${esc(who)}</span>`:'<span class="meta-t">You</span>'}</div>`).join('');
+  const askDisabled=x.chat.filter(m=>m.r==='me').length>=5||x.done;
+  const shell=ch==='call'?`<div class="call"><div class="call-bar"><span class="dot" aria-hidden="true"></span>Connected · ${esc(who)} · Phone</div>${threadHead(t,label)}<div class="chatlog">${log}</div>`:`<div class="sms">${threadHead(t,label)}<div class="chatlog">${log}</div>`;
+  return `${shell}
+  <form class="row" id="chatf"><input type="text" id="chatq" maxlength="300" placeholder="Ask ${esc(who.split(' ')[0])} a follow-up" value="${esc(x.q)}" ${askDisabled?'disabled':''}><button class="btn" ${askDisabled?'disabled':''}>Ask</button></form>
+  <p class="hintline">${ch==='call'?'Phone channel: ask what they know, then write a wrap-up note in Resolve.':'Live chat: up to 5 questions. Good questions cost nothing.'}</p></div>`}
 
-function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Your queue is clear. Replay the built-in tickets when you are ready.</p></div>`;$('#res').innerHTML='';renderMbar();return}
+function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Pull today's practice when you are ready.</p></div>`;$('#res').innerHTML='';renderMbar();return}
   const x=w(t.id);
-  /* Map legacy 'chat' tab from older localStorage sessions onto Client notes */
-  if(x.tab==='chat')x.tab='notes';
-  const tabs=TOOLS.map(([k,l])=>`<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)||(k==='notes'&&x.tools.includes('chat'))?' seen':''}" data-tab="${k}">${l}</button>`).join('');
+  if(x.tab==='notes'||x.tab==='chat')x.tab='ticket';
+  const tabs=TOOLS.map(([k,l])=>{const lab=k==='ticket'?contactLabel(t):l;return `<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)?' seen':''}" data-tab="${k}">${lab}</button>`}).join('');
   let pane='';
-  if(x.tab==='ticket')pane=`${smsThread(t,x)}<p class="hintline">Client texts land here. Your draft previews in the thread as you write below.</p>`;
-  else if(x.tab==='notes')pane=`${smsThread(t,x,{notes:true})}<p class="hintline">Extra facts ${esc(t.from.split(',')[0])} would share if asked — not the diagnosis.</p>`;
+  if(x.tab==='ticket')pane=contactPane(t,x);
   else pane=`<pre class="con">${esc(t.ev[x.tab]||'Nothing relevant.')}</pre><p class="hintline">${{site:'Front-end check: status codes, headers, console and speed.',logs:'Server, PHP and platform logs.',admin:'WordPress or Shopify admin settings, plugins and apps.',code:'Theme and config files.',dns:'DNS records and mail headers.'}[x.tab]}</p>`;
-  const meta=`<div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>`;
-  /* Desktop keeps full meta; phone relies on the sticky context strip (plan included there) */
+  const meta=`<div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Channel</span>${esc(CH[t.channel||'desk'])}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>`;
   const metaBlock=`<div class="md-meta">${meta}</div>`;
-  $('#work').innerHTML=`<article class="tk"><div class="work-head"><div class="chips"><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
+  $('#work').innerHTML=`<article class="tk"><div class="work-head"><div class="chips"><span class="chip ch">${esc(CH[t.channel||'desk'])}</span><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
   <h2>${esc(t.subject)}</h2></div>
   ${metaBlock}
   <div class="tabs" role="tablist">${tabs}</div>${pane}</article>`;
@@ -340,21 +442,14 @@ function renderRes(t,x){
   <fieldset><legend>4. Most likely cause</legend>${t.dx.opts.map((o,i)=>opt('dx',i,o,x.dx===i)).join('')}</fieldset>
   <fieldset><legend>5. First fix</legend>${t.fix.opts.map((o,i)=>opt('fix',i,o,x.fix===i)).join('')}</fieldset>`;
   const first=who.split(/\s+/)[0]||who;
-  /* Phone reply: SMS thread + compose; tools pane is hidden via data-rstep=reply */
-  const replyPhone=`${smsThread(t,x)}
-  <div class="sms-compose"><label class="hintline" for="reply">Your reply</label>
-  <textarea id="reply" maxlength="4000" placeholder="Hi ${esc(first)}, …">${esc(x.reply)}</textarea>
+  const ph=({desk:'Hi '+first+', …',chat:'Quick reply as you would in chat…',call:'Hi '+first+', thanks for your time on the call…'})[t.channel||'desk'];
+  const compose=`<div class="sms-compose"><label class="hintline" for="reply">${esc(replyLegend(t,who))}</label>
+  <textarea id="reply" maxlength="4000" placeholder="${esc(ph)}">${esc(x.reply)}</textarea>
   <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div></div>`;
-  const replyDesk=`<fieldset><legend>6. Text ${esc(who)} back</legend>
-  ${smsThread(t,x)}
-  <div class="sms-compose"><label class="hintline" for="reply">Your reply (as you'd send from the desk)</label>
-  <textarea id="reply" maxlength="4000" placeholder="Hi ${esc(first)}, …">${esc(x.reply)}</textarea>
-  <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div></div></fieldset>`;
-  /* Phone: triage under tools, then a focused reply step; desktop shows the full form */
+  const replyPhone=compose;
+  const replyDesk=`<fieldset><legend>6. ${esc(replyLegend(t,who))}</legend>${compose}</fieldset>`;
   const phoneSplit=isPhone();
-  const body=phoneSplit
-    ?(x.rstep==='reply'?replyPhone:triage)
-    :(triage+replyDesk);
+  const body=phoneSplit?(x.rstep==='reply'?replyPhone:triage):(triage+replyDesk);
   setMview(mview);
   $('#res').innerHTML=`<div id="resolve-anchor"></div>
   <h2>${phoneSplit?(x.rstep==='reply'?`Reply to ${esc(first)}`:'Triage'):'Resolve this ticket'}</h2>
@@ -373,38 +468,42 @@ function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));cons
   ['Checked the right tool',x.tools.includes(t.keyTool)?2:0,2,x.tools.includes(t.keyTool)?'':'The evidence was in '+kt],
   ['Diagnosis',x.dx===t.dx.a?4:0,4,t.dx.why],['First fix',x.fix===t.fix.a?4:0,4,t.fix.why]]}
 
+function missList(P){return P.filter(p=>p[1]<p[2]).map(p=>({title:p[0],why:p[3]}))}
+
 function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.reduce((a,p)=>a+p[1],0);const tot=base+(rp??0);
   let replyBlock='';
-  if(x.done.state==='self')replyBlock=`<p class="note">Compare your text with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w desk-submit" id="selfok">Confirm reply score</button>`;
+  if(x.done.state==='self')replyBlock=`<p class="note">Compare your reply with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w desk-submit" id="selfok">Confirm reply score</button>`;
+  else if(x.done.state==='learn'){const misses=x.done.misses||[];
+    replyBlock=`<p class="note"><b>Lock it in</b> — read why each miss happened, then the takeaway.</p>
+    ${misses.map(m=>`<div class="note miss"><b>${esc(m.title)}:</b> ${esc(m.why)}</div>`).join('')}
+    <p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>
+    <button class="btn w desk-submit" id="gotit">Got it — continue</button>`}
   renderCtx();
   $('#res').innerHTML=`<h2>Score</h2><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
   <table class="parts">${P.map(p=>`<tr><td>${esc(p[0])}${p[1]<p[2]?`<div class="miss note">${esc(p[3])}</div>`:''}</td><td class="${p[1]===p[2]?'hit':'miss'}">${p[1]}/${p[2]}</td></tr>`).join('')}<tr><td>Client reply</td><td>${rp==null?'…':rp+'/8'}</td></tr></table>
   ${replyBlock}
-  <details class="sheet" ${x.done.state==='self'?'':'open'}><summary>Sent thread</summary><div class="sheet-body"><div class="sms">${smsHead(t)}${smsParts(t.body).map(p=>`<div class="bubble in">${esc(p)}</div>`).join('')}${x.reply.trim()?`<div class="bubble out">${esc(x.reply)}<span class="meta-t">You · sent</span></div>`:''}</div></div></details>
   <details ${x.done.state==='self'?'open':''}><summary>Model reply</summary><p class="body" style="font-size:15px">${esc(t.model)}</p></details>
-  <p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>${/^https:\/\//.test(t.url||'')?`<p class="note"><a href="${esc(t.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}
-  ${x.done.state==='final'?`<button class="btn w desk-submit" id="next">${S.queue.length?'Next ticket':'Finish'}</button>`:''}`}
+  ${x.done.state==='final'?`<p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>${/^https:\/\//.test(t.url||'')?`<p class="note"><a href="${esc(t.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}<button class="btn w desk-submit" id="next">${S.queue.length?'Next ticket':'Finish'}</button>`:''}`}
 
 function renderMbar(){const bar=$('#mbar');if(!bar)return;
   if(!isPhone()||mview==='queue'){bar.hidden=true;bar.innerHTML='';return}
   bar.hidden=false;const t=find(cur),x=t&&w(t.id);
   let html='';
-  /* One primary action for the current step — no stage chrome to memorise */
   if(mview==='work'&&x&&!x.done){
     if(x.rstep==='reply')html=`<button type="button" class="btn ghost" data-act="to-triage">Back</button><button type="button" class="btn" data-act="submit">Send and resolve</button>`;
     else html=`<button type="button" class="btn" data-act="to-reply">Continue to reply</button>`;
   }else if(mview==='score'&&x&&x.done){
     if(x.done.state==='self')html=`<button type="button" class="btn" data-act="selfok">Confirm reply score</button>`;
+    else if(x.done.state==='learn')html=`<button type="button" class="btn" data-act="gotit">Got it — continue</button>`;
     else html=`<button type="button" class="btn" data-act="next">${S.queue.length?'Next ticket':'Finish'}</button>`;
   }
   bar.innerHTML=html}
 
-function renderFoot(){const wk=weakest();
+function renderFoot(){const wk=weakest();const due=dueCount();
   const sk=AREAS.map(a=>{const r=S.areas[a],p=areaPct(a);return `<div class="sk"><span>${esc(a)}</span><div class="bar"><i style="width:${p==null?0:Math.round(p*100)}%"></i></div><b>${p==null?'–':Math.round(p*100)+'%'}</b></div>`}).join('');
-  const body=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. Replay tickets to practise weak areas.</p></div>
+  const body=`<div><h2>Skills</h2>${sk}<p class="hintline">Next focus: ${esc(wk)}. ${due?`${due} due for spaced revisit.`:'Practice fills the queue from due, unseen and weak areas.'}</p></div>
   <div><h2>Career path · UK salary</h2><ol class="certs">${CERTS.map(c=>`<li class="${S.resolved>=c[0]?'got':''}"><span>${esc(c[1])} · ${fmtBand(c)}</span><span>${c[0]} tickets</span></li>`).join('')}</ol><p class="hintline">Title jumps at ticket thresholds; the £ midpoint drifts with average score and streak.</p></div>
   <div><h2>Recent tickets</h2><ul class="hist">${S.hist.slice(0,8).map(h=>`<li><span>${esc(h.s)}</span><b>${h.g}/25</b></li>`).join('')||'<li><span>Resolve a ticket to start your record.</span></li>'}</ul></div>`;
-  /* Phone queue: keep skills/career behind a sheet so the open list is the first screen */
   $('#foot').innerHTML=`<details class="sheet monly"><summary>Skills, career path and recent tickets</summary><div class="sheet-body foot-inner">${body}</div></details><div class="foot-desk">${body}</div>`}
 
 function render(){
@@ -424,11 +523,16 @@ function goMview(v){const t=find(cur),x=t&&w(t.id);
   else return;
   setMview(mview);renderWork();window.scrollTo(0,0)}
 
-function commit(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.reply||0);
+function recordJournal(t,tot,misses){const days=spacedDays(tot);const dueAt=Date.now()+days*864e5;
+  S.journal[t.id]={score:tot,misses:misses.map(m=>m.title),dueAt,at:Date.now(),n:((S.journal[t.id]||{}).n||0)+1}}
+
+function finishTicket(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.reply||0);
   S.resolved++;S.sum+=tot;S.max+=25;const r=S.areas[t.area]||(S.areas[t.area]={s:0,m:0,n:0});r.s+=tot;r.m+=25;r.n++;
   const d=today();if(S.lastDay!==d){const y=new Date(Date.now()-864e5).toLocaleDateString('en-CA');S.streak=S.lastDay===y?(S.streak||0)+1:1;S.lastDay=d}
-  S.hist.unshift({s:t.subject,a:t.area,g:tot,at:Date.now()});S.hist=S.hist.slice(0,60);
-  S.seen.push(t.subject);S.seen=S.seen.slice(-40);DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);x.done.state='final';save()}
+  S.hist.unshift({s:t.subject,a:t.area,g:tot,ch:t.channel||'desk',at:Date.now()});S.hist=S.hist.slice(0,60);
+  S.seen.push(t.subject);S.seen=S.seen.slice(-80);
+  recordJournal(t,tot,x.done.misses||[]);
+  DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);x.done.state='final';save()}
 
 document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
   if(el.dataset.open){cur=el.dataset.open;w(cur).rstep='triage';mview='work';render();return}
@@ -436,7 +540,8 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,[data-op
   const t=find(cur),x=t&&w(t.id);
   const act=el.dataset.act||el.id;
   if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);renderWork();return}
-  if(act==='replay'){S.queue=BANK.map(b=>shuf(clone(b)));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;mview='work';save();render();return}
+  if(act==='practice'){S.queue=buildPractice(6);Object.keys(W).forEach(k=>delete W[k]);Object.keys(DONE).forEach(k=>delete DONE[k]);cur=S.queue[0]?.id||null;mview=cur?'work':'queue';save();render();return}
+  if(act==='replay'){S.queue=BANK.map(b=>shuf(withChannel(clone(b))));BANK.forEach(b=>{delete W[b.id];delete DONE[b.id]});cur=S.queue[0].id;mview='work';save();render();return}
   if(act==='to-reply'&&t){
     if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);renderMbar();
       if(isPhone()){const a=$('#resolve-anchor');if(a)a.scrollIntoView({behavior:'smooth',block:'start'})}
@@ -452,19 +557,19 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,[data-op
     if(x.reply.trim().length<60){x.err='Write a fuller reply to the client.';x.rstep='reply';mview='work';setMview(mview);renderWork();
       if(isPhone()){requestAnimationFrame(()=>$('#reply')?.scrollIntoView({behavior:'smooth',block:'center'}))}
       return}
-    x.err='';x.done={parts:parts(t,x),reply:null,fb:null,state:'self',at:Date.now()};mview='score';render();return}
-  if(act==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;commit(t,x);mview='score';render();return}
+    const P=parts(t,x);x.err='';x.done={parts:P,reply:null,fb:null,misses:missList(P),state:'self',at:Date.now()};mview='score';render();return}
+  if(act==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;
+    if((x.done.misses||[]).length){x.done.state='learn';mview='score';render();return}
+    finishTicket(t,x);mview='score';render();return}
+  if(act==='gotit'&&t){finishTicket(t,x);mview='score';render();return}
   if(act==='next'){if(S.queue.length){cur=S.queue[0].id;w(cur).rstep='triage';mview='work';render()}else{cur=null;mview='queue';render()}}
 });
 document.addEventListener('change',e=>{const t=find(cur);if(!t)return;const x=w(t.id),n=e.target.name,v=e.target.value;
   if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
-document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id!=='reply')return;
-  x.reply=e.target.value;const text=x.reply.trim();
-  /* Live-update draft bubbles in Messages without resetting triage */
-  document.querySelectorAll('.sms [data-draft]').forEach(b=>{
-    b.hidden=!text;const dt=b.querySelector('.draft-text');if(dt)dt.textContent=text?x.reply:'';
-  });
-});
+document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value});
+document.addEventListener('submit',e=>{if(e.target.id!=='chatf')return;e.preventDefault();const t=find(cur);if(!t)return;const x=w(t.id);
+  const q=(x.q||'').trim();if(!q||x.done)return;if(x.chat.filter(m=>m.r==='me').length>=5)return;
+  x.chat.push({r:'me',t:q});x.q='';x.chat.push({r:'cl',t:scriptReply(t,q)});renderWork()});
 const tick=setInterval(()=>{const t=find(cur);if(!t||!W[t.id]||W[t.id].done)return;const s=fmtT(Date.now()-W[t.id].start);
   document.querySelectorAll('#timer,#timer-m').forEach(el=>{el.textContent=s})},1000);
 matchMedia('(max-width:760px)').addEventListener('change',()=>render());
