@@ -3,94 +3,134 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Service Desk Simulator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 /* VOICE: a working help desk; calm, exact, a little ceremonial when you earn a certificate.
    IDEA: a Zoho-style workbench with desk email, live chat and phone-call channels, plus lab-bench evidence drawers.
    PICTURE: the open contact and its tool tabs, filling the first screen mid-use.
-   COLOUR and TYPE: white ground, prussian band and actions, carmine for urgency and misses; Literata throughout.
+   COLOUR and TYPE: white ground, prussian band and actions, carmine for urgency; Source Sans 3 chrome, Literata for client words and ceremony.
    LAYOUT: desktop = queue | contact + tools | resolve; phone = queue → work → score with sticky context. */
-:root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8}
+:root{color-scheme:light dark;--bg:light-dark(#fff,#0f1217);--ink:light-dark(#10131a,#e8ebf0);--mute:light-dark(#5a6170,#9aa3b2);--line:light-dark(#e1e4ea,#272c36);--panel:light-dark(#f5f6f8,#161a21);--pr:light-dark(#0b4f8a,#6aaae6);--prb:light-dark(#0b4f8a,#0b2b4d);--cr:light-dark(#c1121f,#ff6670);--ok:light-dark(#0b4f8a,#6aaae6);--okg:#1a7f37;--con:light-dark(#0f1522,#0a0d12);--cont:#d6dde8;--chrome:light-dark(#e8eaef,#1c212b);--sans:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;--serif:Literata,Georgia,serif}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Literata,Georgia,serif;overflow-x:clip;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);overflow-x:clip;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
 button,input,select,textarea{font:inherit;color:inherit;touch-action:manipulation}
 button{cursor:pointer}
 :focus-visible{outline:3px solid var(--pr);outline-offset:2px}
+.btn,.tab,.qitem,.opt,.segbtn{transition:border-color .2s ease,background-color .2s ease,color .2s ease,box-shadow .2s ease,opacity .2s ease}
 .band{padding:clamp(18px,3vw,36px) max(4vw,16px)}
 header.band{background:var(--prb);color:#fff;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:end;justify-content:space-between;padding-top:max(clamp(18px,3vw,36px),env(safe-area-inset-top))}
-h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0;font-weight:700;text-wrap:balance}
+h1{font-family:var(--serif);font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0;font-weight:700;text-wrap:balance}
 header p{margin:6px 0 0;opacity:.85;font-size:15px}
 .stats{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:end}
-.stat b{display:block;font-size:26px;line-height:1.1;white-space:nowrap}.stat span{font-size:13px;opacity:.85}
-.cert{min-width:220px}.meter{height:8px;background:rgba(255,255,255,.22);border-radius:4px;overflow:hidden;margin-top:6px}.meter i{display:block;height:100%;background:#fff}
+.stat b{display:block;font-size:26px;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums}.stat span{font-size:13px;opacity:.85}
+.cert{min-width:220px}.meter{height:8px;background:rgba(255,255,255,.22);border-radius:4px;overflow:hidden;margin-top:6px}.meter i{display:block;height:100%;background:#fff;transition:width .45s ease}
 .status{font-size:13px;opacity:.9;width:100%}
 main{display:grid;grid-template-columns:270px minmax(0,1fr) 360px;gap:0;border-bottom:1px solid var(--line);max-width:1600px;margin:0 auto}
 .queue{border-right:1px solid var(--line);padding:16px;background:var(--panel)}
-.queue h2,.res h2,.foot h2{font-size:17px;margin:0 0 10px}
-.qitem{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;min-height:44px}
-.qitem.on{border-color:var(--pr);box-shadow:inset 3px 0 0 var(--pr)}
+.queue h2,.res h2,.foot h2{font-size:17px;margin:0 0 10px;letter-spacing:-.01em}
+.qitem{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px 8px;margin-bottom:0;min-height:44px}
+.qitem:hover{background:light-dark(rgba(11,79,138,.04),rgba(106,170,230,.08))}
+.qitem.on{background:var(--bg);border:1px solid var(--line);border-radius:8px;margin-bottom:6px;padding:11px 12px;box-shadow:inset 3px 0 0 var(--pr)}
 .qitem .s{font-weight:600;font-size:15px;line-height:1.3;display:block}
-.qitem .m{font-size:13px;color:var(--mute);display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.qitem .m{font-size:12px;color:var(--mute);display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .pri-Urgent,.pri-High{color:var(--cr);font-weight:600}
 .gen{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 .gen label{font-size:13px;color:var(--mute);display:block;margin-bottom:4px}
 select,input[type=text],textarea{width:100%;font-size:16px;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border-radius:6px;border:1px solid var(--pr);background:var(--pr);color:light-dark(#fff,#0f1217);font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid var(--pr);background:var(--pr);color:light-dark(#fff,#0f1217);font-weight:600}
+.btn:hover:not([disabled]){filter:brightness(1.06)}
 .btn.ghost{background:transparent;color:var(--pr)}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 .btn.w{width:100%;margin-top:8px}
 .work{padding:18px clamp(14px,2vw,26px)}
-.tk h2{font-size:clamp(24px,2.6vw,32px);line-height:1.1;margin:4px 0 12px;text-wrap:balance}
-.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:13px;border:1px solid var(--line);border-radius:20px;padding:2px 10px;white-space:nowrap}
+.tk h2{font-family:var(--serif);font-size:clamp(24px,2.6vw,32px);line-height:1.1;margin:4px 0 12px;text-wrap:balance}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:3px 9px;white-space:nowrap;color:var(--mute)}
 .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 18px;font-size:14px;padding:12px 0;border-block:1px solid var(--line);margin-bottom:12px}
-.meta span{color:var(--mute);display:block;font-size:13px}
+.meta span{color:var(--mute);display:block;font-size:12px}
 .tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:14px}
 .tab{flex:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px;min-height:44px;color:var(--mute);font-weight:600}
 .tab.on{color:var(--ink);border-color:var(--pr)}.tab.seen:not(.on)::after{content:" ·";color:var(--pr)}
-.body{white-space:pre-wrap;font-size:17px;max-width:68ch}
-pre.con{background:var(--con);color:var(--cont);padding:14px 16px;border-radius:8px;overflow-x:auto;font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.tab.hit.seen:not(.on)::after{content:" ✓";color:var(--okg)}
+.body,.model-reply{font-family:var(--serif);white-space:pre-wrap;font-size:17px;max-width:68ch}
+pre.con{background:var(--con);color:var(--cont);padding:14px 16px;margin:0;border-radius:0;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
 .hintline{font-size:13px;color:var(--mute)}
-.chip.ch{border-color:var(--pr);color:var(--pr);font-weight:600}
-.mail{border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:14px 16px;max-width:68ch}
+.chip.ch{border-color:var(--pr);color:var(--pr);font-weight:600;background:light-dark(rgba(11,79,138,.06),rgba(106,170,230,.12))}
+.chip.diff-easy{border-color:var(--okg);color:var(--okg)}
+.chip.diff-hard{border-color:var(--cr);color:var(--cr)}
+.gen .seg{margin:8px 0}
+.team .sms-av{background:light-dark(#1a3a5c,#2a4a6e)}
+.team-cost{font-size:12px;color:var(--mute);margin:0}
+.mail{border:1px solid light-dark(#d0d7e2,#2a3140);border-radius:12px;background:var(--bg);padding:16px 18px;max-width:68ch;box-shadow:0 10px 28px light-dark(rgba(16,19,26,.06),rgba(0,0,0,.28))}
 .mail-h{font-size:13px;color:var(--mute);border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:12px;display:grid;gap:4px}
 .mail-h b{color:var(--ink);font-weight:600}
+.tool{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);box-shadow:0 8px 22px light-dark(rgba(16,19,26,.05),rgba(0,0,0,.22))}
+.tool-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;background:var(--chrome);border-bottom:1px solid var(--line)}
+.tool-name{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+.urlbar{flex:1 1 180px;display:flex;align-items:center;gap:8px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font:12.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:var(--mute)}
+.urlbar .lock{width:8px;height:8px;border-radius:50%;background:var(--okg);flex:none;box-shadow:0 0 0 3px rgba(26,127,55,.15)}
+.urlbar .lock.off{background:var(--mute);box-shadow:none}
+.urlbar .urltext{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tool-note{margin:10px 0 0;font-size:13px;color:var(--mute)}
+.tool-note.found{color:var(--okg);font-weight:600}
+.conn-gate{padding:28px 18px;text-align:center;background:light-dark(#f7f8fb,#12161d)}
+.conn-gate .conn-title{font-family:var(--serif);font-size:18px;font-weight:700;margin:0 0 6px}
+.conn-gate .conn-meta{font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;color:var(--mute);margin:0 0 14px}
+.conn-gate .btn{min-width:min(100%,220px)}
+.sess{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;border-bottom:1px solid var(--line);background:light-dark(#eef6f0,#152018);font-size:13px;font-weight:600;color:var(--okg)}
+.sess .dot{width:8px;height:8px;border-radius:50%;background:var(--okg);box-shadow:0 0 0 3px rgba(26,127,55,.2);animation:pulse 1.8s ease-in-out infinite;flex:none}
+.sess .sess-path{flex:1 1 140px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:12.5px/1.3 ui-monospace,Menlo,Consolas,monospace;color:var(--mute);font-weight:500}
+.sess .btn.sm{min-height:36px;padding:4px 12px;font-size:13px;margin:0}
 .call{border:1px solid var(--line);border-radius:12px;background:light-dark(#f0f4f8,#12161d);padding:14px 12px;display:flex;flex-direction:column;gap:10px}
 .call-bar{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--pr)}
-.call-bar .dot{width:8px;height:8px;border-radius:50%;background:#1a7f37;box-shadow:0 0 0 3px rgba(26,127,55,.2)}
+.call-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--okg);box-shadow:0 0 0 3px rgba(26,127,55,.2);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(26,127,55,.2)}50%{box-shadow:0 0 0 6px rgba(26,127,55,.08)}}
 .chatlog{display:grid;gap:8px;margin-bottom:10px}
 .row{display:flex;gap:8px}.row input{flex:1}
 /* Chat/call bubbles — inbound grey, outbound Prussian */
 
 .sms{display:flex;flex-direction:column;gap:8px;padding:14px 12px;border:1px solid var(--line);border-radius:12px;background:
   radial-gradient(120% 80% at 0% 0%,light-dark(#e8eef5,#1a2433) 0%,transparent 55%),
-  light-dark(#eef1f5,#12161d);min-height:140px}
+  light-dark(#eef1f5,#12161d);min-height:140px;box-shadow:0 8px 22px light-dark(rgba(16,19,26,.05),rgba(0,0,0,.22))}
 .sms-head{display:flex;align-items:center;gap:10px;padding:0 2px 8px;border-bottom:1px solid light-dark(#d5dbe5,#2a3140);margin-bottom:4px}
-.sms-av{flex:none;width:36px;height:36px;border-radius:50%;background:var(--prb);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.sms-av{flex:none;width:36px;height:36px;border-radius:50%;background:var(--prb);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;font-family:var(--sans)}
 .sms-who{font-weight:600;font-size:14px;line-height:1.2}.sms-who span{display:block;font-weight:400;font-size:12px;color:var(--mute)}
-.bubble{max-width:88%;padding:9px 12px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word;animation:pop .28s ease-out}
+.bubble{max-width:88%;padding:9px 12px;font-family:var(--serif);font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word;animation:pop .28s ease-out}
 .bubble.in{align-self:flex-start;background:light-dark(#fff,#1e2430);border:1px solid var(--line);border-radius:16px 16px 16px 4px;color:var(--ink)}
 .bubble.out{align-self:flex-end;background:var(--pr);color:light-dark(#fff,#0f1217);border-radius:16px 16px 4px 16px}
-.bubble .meta-t{display:block;font-size:11px;opacity:.7;margin-top:4px}
+.bubble .meta-t{display:block;font-family:var(--sans);font-size:11px;opacity:.7;margin-top:4px}
 @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .sms-compose{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-.sms-compose textarea{min-height:110px;resize:vertical;line-height:1.45;border-radius:18px;padding:12px 14px;border:1px solid var(--line);background:var(--bg)}
+.sms-compose textarea{min-height:110px;resize:vertical;line-height:1.45;border-radius:14px;padding:12px 14px;border:1px solid var(--line);background:var(--bg);font-family:var(--serif)}
 .sms-compose .sendrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .sms-compose .sendrow .hintline{margin:0}
 .res{border-left:1px solid var(--line);padding:16px;background:var(--panel)}
 fieldset{border:0;padding:0;margin:0 0 16px}
 legend{font-weight:600;font-size:15px;margin-bottom:6px;padding:0}
-.opt{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border:1px solid var(--line);border-radius:6px;margin-bottom:5px;background:var(--bg);font-size:14.5px;line-height:1.4;cursor:pointer;min-height:44px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;background:var(--bg);font-size:14.5px;line-height:1.4;cursor:pointer;min-height:44px}
+.opt:hover{border-color:light-dark(#c5ccd8,#3a4252)}
+.opt:has(input:checked){border-color:var(--pr);box-shadow:inset 0 0 0 1px var(--pr);background:light-dark(rgba(11,79,138,.04),rgba(106,170,230,.1))}
 .opt input{margin-top:3px;flex:none;width:18px;height:18px;accent-color:var(--pr)}
 .seg{display:flex;flex-wrap:wrap;gap:5px}.seg .opt{flex:1 1 auto;margin:0;align-items:center}
 .err{color:var(--cr);font-size:14px;min-height:1em}
-.score{font-size:52px;font-weight:700;line-height:1;margin:6px 0}
+.verdict{font-family:var(--serif);font-size:20px;font-weight:700;line-height:1.2;margin:0 0 4px;animation:pop .35s ease-out}
+.verdict.good{color:var(--pr)}.verdict.mid{color:var(--ink)}.verdict.low{color:var(--cr)}
+.score{font-family:var(--serif);font-size:52px;font-weight:700;line-height:1;margin:6px 0;font-variant-numeric:tabular-nums;animation:pop .4s ease-out .05s both}
 .parts{width:100%;border-collapse:collapse;font-size:14px;margin:8px 0 14px}
 .parts td{padding:6px 0;border-bottom:1px solid var(--line);vertical-align:top}.parts td:last-child{text-align:right;white-space:nowrap;padding-left:8px}
 .miss{color:var(--cr)}.hit{color:var(--ok)}
 .note{font-size:14px;margin:4px 0 10px}
-details{border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin:8px 0;background:var(--bg)}summary{cursor:pointer;font-weight:600;min-height:28px}
+.promo{border:1px solid var(--pr);border-radius:12px;padding:14px 16px;margin:0 0 14px;background:light-dark(rgba(11,79,138,.06),rgba(106,170,230,.12));animation:pop .4s ease-out}
+.promo b{display:block;font-family:var(--serif);font-size:18px;margin:0 0 4px}
+.promo span{font-size:13px;color:var(--mute)}
+details{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;background:var(--bg)}summary{cursor:pointer;font-weight:600;min-height:28px}
+.closing{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:light-dark(rgba(255,255,255,.72),rgba(15,18,23,.78));backdrop-filter:blur(6px)}
+.closing[hidden]{display:none}
+.closing-card{display:flex;align-items:center;gap:10px;padding:16px 22px;border-radius:12px;border:1px solid var(--line);background:var(--bg);box-shadow:0 16px 40px light-dark(rgba(16,19,26,.12),rgba(0,0,0,.4));font-weight:600;font-size:16px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(12px);z-index:70;padding:10px 16px;border-radius:999px;background:var(--prb);color:#fff;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;max-width:min(92vw,420px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:760px){.toast{bottom:calc(84px + env(safe-area-inset-bottom))}}
 .foot{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1fr);gap:28px;max-width:1600px;margin:0 auto}
 .foot-desk{display:contents}
 .sk{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 64px;gap:8px;align-items:center;font-size:14px;margin-bottom:6px}
@@ -102,7 +142,7 @@ ol,ul{margin:0;padding:0;list-style:none}
 .empty{padding:30px 0;color:var(--mute)}
 .spin{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:r 1s linear infinite;vertical-align:-1px;margin-right:6px}
 @keyframes r{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.spin,.bubble{animation:none}}
+@media(prefers-reduced-motion:reduce){.spin,.bubble,.call-bar .dot,.verdict,.score,.promo,.meter i,.sess .dot{animation:none;transition:none}.toast{transition:none}}
 @media(max-width:1180px){main{grid-template-columns:240px minmax(0,1fr)}.res{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.foot{grid-template-columns:1fr 1fr}.foot>:first-child{grid-column:1/-1}}
 /* Phone chrome: sticky ticket context + one primary action (hidden on desktop) */
 .mbar,.monly,.mctx{display:none}
@@ -110,10 +150,8 @@ ol,ul{margin:0;padding:0;list-style:none}
 .mbar .btn{flex:1;margin:0}
 #ctx{display:none}
 .mctx{flex-direction:column;gap:2px;padding:8px max(4vw,16px) 10px;border-bottom:1px solid var(--line);background:var(--bg)}
-.mctx-sub{font-weight:700;font-size:15px;line-height:1.25;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mctx-sub{font-family:var(--serif);font-weight:700;font-size:15px;line-height:1.25;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mctx-line{font-size:12px;color:var(--mute);margin:0;display:flex;flex-wrap:wrap;gap:4px 10px}
-.mctx-plan{font-size:12px;color:var(--mute);margin:2px 0 0;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.mctx-snip{font-size:13px;color:var(--ink);margin:4px 0 0;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;opacity:.9}
 .mctx .pri-Urgent,.mctx .pri-High{font-weight:600}
 .sheet{border:1px solid var(--line);border-radius:10px;background:var(--bg);margin:8px 0}
 .sheet>summary{list-style:none;cursor:pointer;font-weight:600;padding:10px 12px;min-height:44px;display:flex;align-items:center;justify-content:space-between}
@@ -163,8 +201,6 @@ ol,ul{margin:0;padding:0;list-style:none}
   /* Reply step: hide tools pane — sticky context + SMS compose only */
   body[data-mview=work][data-rstep=reply] .work{display:none}
   body[data-mview=work][data-rstep=reply] .res{border-top:0}
-  /* Thread is on screen, so drop the long quote/plan from the strip */
-  body[data-rstep=reply] .mctx-snip,body[data-rstep=reply] .mctx-plan{display:none}
   body[data-mview=score] .queue,body[data-mview=score] .work{display:none}
   body:not([data-mview=queue]) .foot{display:none}
   body[data-mview=queue] .mbar{display:none}
@@ -174,27 +210,99 @@ ol,ul{margin:0;padding:0;list-style:none}
   /* Skills/career stay behind a sheet on the queue only */
   .monly{display:block}
 }
-</style></head><body>
+/* Desk shell: stations sit beside the ticket shift (agency WP/Shopify) */
+.shell{display:grid;grid-template-columns:200px minmax(0,1fr);max-width:1680px;margin:0 auto;min-height:calc(100dvh - 120px);border-bottom:1px solid var(--line)}
+.rail{background:var(--panel);border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:4px}
+.rail .rail-lab{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);padding:8px 10px 4px}
+.rail button{display:block;width:100%;text-align:left;background:transparent;border:0;border-radius:8px;padding:10px 12px;min-height:44px;font-weight:600;font-size:14px;color:var(--mute)}
+.rail button:hover{background:light-dark(rgba(11,79,138,.06),rgba(106,170,230,.1));color:var(--ink)}
+.rail button.on{background:var(--bg);color:var(--pr);box-shadow:inset 3px 0 0 var(--pr)}
+.rail button .n{float:right;font-size:12px;font-weight:700;color:var(--cr)}
+.stage{min-width:0;display:flex;flex-direction:column}
+.desk{padding:18px clamp(14px,2vw,28px);flex:1}
+.desk-hero{margin:0 0 18px}
+.desk-hero h2{font-family:var(--serif);font-size:clamp(22px,3vw,30px);margin:0 0 6px;line-height:1.15}
+.desk-hero p{margin:0;color:var(--mute);max-width:62ch}
+.station-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:0 0 22px}
+.station-card{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-height:96px;box-shadow:0 6px 18px light-dark(rgba(16,19,26,.04),rgba(0,0,0,.2))}
+.station-card:hover{border-color:var(--pr)}
+.station-card b{display:block;font-size:15px;margin:0 0 4px}
+.station-card span{font-size:13px;color:var(--mute)}
+.mod-list,.kb-list,.dir-list{display:grid;gap:8px}
+.mod-list button,.kb-list button,.dir-list button{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-height:48px}
+.mod-list button:hover,.kb-list button:hover,.dir-list button:hover{border-color:var(--pr)}
+.mod-list b,.kb-list b,.dir-list b{display:block;font-size:15px}
+.mod-list span,.kb-list span,.dir-list span{font-size:13px;color:var(--mute)}
+.kb-article{max-width:68ch}
+.kb-article h3{font-family:var(--serif);font-size:22px;margin:0 0 8px}
+.kb-article .body{font-size:16px}
+.dir-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--bg);margin-bottom:10px}
+.dir-card h3{margin:0 0 6px;font-size:17px}
+.dir-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:13px;margin-top:8px}
+.dir-meta span{color:var(--mute);display:block;font-size:11px}
+.host-panel,.dns-panel{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);max-width:720px}
+.host-panel .tool-bar,.dns-panel .tool-bar{justify-content:space-between}
+body[data-app=desk] main,body[data-app=desk] .foot{display:none}
+body[data-app=ticket] .desk{display:none}
+body[data-app=ticket] .shell{border-bottom:0}
+body[data-app=ticket] main{border-bottom:1px solid var(--line)}
+@media(max-width:760px){
+  .shell{grid-template-columns:1fr;min-height:0}
+  .rail{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:6px;-webkit-overflow-scrolling:touch}
+  .rail .rail-lab{display:none}
+  .rail button{flex:none;width:auto;white-space:nowrap;padding:8px 12px;min-height:40px;font-size:13px}
+  .rail button.on{box-shadow:inset 0 -3px 0 var(--pr)}
+  body[data-app=ticket] .rail{display:none}
+  body[data-app=desk]{padding-bottom:max(16px,env(safe-area-inset-bottom))}
+}
+</style></head><body data-app="desk">
 <header class="band" id="hdr"></header>
 <!-- Phone sticky ticket context; filled by renderCtx() so it stays visible over tools/SMS/triage -->
 <div id="ctx" hidden></div>
+<div class="shell">
+<nav class="rail" id="rail" aria-label="Desk stations"></nav>
+<div class="stage">
+<section class="desk" id="desk" aria-label="Desk"></section>
 <main>
   <section class="queue" aria-label="Ticket queue"><h2 id="qh">Queue</h2><div id="qlist"></div><div class="gen" id="gen"></div></section>
   <section class="work" id="work" aria-label="Ticket"></section>
   <aside class="res" id="res" aria-label="Resolution"></aside>
 </main>
 <section class="band foot" id="foot"></section>
+</div>
+</div>
 <!-- Phone sticky primary action; filled by renderMbar() -->
 <div class="mbar" id="mbar" hidden></div>
+<div class="closing" id="closing" hidden><div class="closing-card"><span class="spin" aria-hidden="true"></span>Closing ticket…</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 {
 const AREAS=['WordPress core & PHP','Plugins & WooCommerce','Performance & caching','Security & hacked sites','Divi & page builders','Shopify themes & Liquid','Shopify apps & integrations','Shopify admin & checkout','DNS, domains & email'];
 /* UK market bands (£k): title jumps at ticket thresholds; midpoint drifts with score and streak */
 const CERTS=[[10,'First line support',22,28],[50,'Experienced agent',28,35],[150,'Senior / specialist',35,45],[400,'Team lead',45,55],[1000,'Head of support',55,75]];
-const TOOLS=[['ticket','Contact'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail']];
+const TOOLS=[['ticket','Contact'],['site','Site check'],['logs','Logs'],['admin','Admin'],['code','Code'],['dns','DNS & mail'],['team','Team']];
 const CH={desk:'Desk',chat:'Live chat',call:'Phone call'};
 const PRI=['Low','Normal','High','Urgent'];
 const BILL={covered:'Covered by plan',overage:'Covered, but flag overage',adhoc:'Ad-hoc quote'};
+const DIFF_LABEL={easy:'Easy',normal:'Normal',hard:'Hard'};
+/* Seed difficulty — remixed tickets inherit from seed id */
+const DIFF_BY_ID={b1:'easy',b2:'hard',b3:'normal',b4:'normal',b5:'normal',b6:'easy',b7:'hard',b8:'easy',b9:'normal',b10:'normal',b11:'normal',b12:'hard'};
+/* Desk stations — tickets are one inbox among several (agency WP/Shopify) */
+const STATIONS=[['home','Dashboard'],['queue','Ticket queue'],['docs','Knowledge base'],['directory','Client directory'],['hosting','Hosting panel'],['dns','DNS console']];
+const MODULES=[
+  {id:'m-cache',title:'Your first agency shift',mins:20,blurb:'How a retainer ticket moves from contact → evidence → plain-English reply.',area:'Performance & caching'},
+  {id:'m-wh',title:'Payments & webhooks',mins:25,blurb:'Why Stripe/Woo “pending” tickets are usually a URL or redirect problem.',area:'Plugins & WooCommerce'},
+  {id:'m-dns',title:'DNS & mail authentication',mins:25,blurb:'Duplicate A records, SPF merges, and “sometimes it works”.',area:'DNS, domains & email'},
+  {id:'m-shop',title:'Shopify leftovers',mins:20,blurb:'Theme app embeds, pasted scripts, and discounts that won’t combine.',area:'Shopify apps & integrations'}
+];
+const KB=[
+  {id:'kb1',area:'Performance & caching',title:'Logged-in sees it, public does not',body:'Almost always page cache. Compare response headers (x-litespeed-cache, cf-cache-status, age) in a private window vs while logged in. Purge the URL, then fix purge-on-update so it does not recur.',url:'https://docs.litespeedtech.com/lscache/lscwp/cache/'},
+  {id:'kb2',area:'Plugins & WooCommerce',title:'Orders stuck on Pending payment',body:'Gateways confirm payment by webhook. Domain, SSL or www redirects break delivery because webhooks do not follow 301s. Check the gateway webhook log first, then update the endpoint and resend.',url:'https://docs.stripe.com/webhooks'},
+  {id:'kb3',area:'DNS, domains & email',title:'Domain sometimes shows the old page',body:'“Sometimes” points to duplicate records, not slow propagation. List every A/AAAA/CNAME on the name. Remove parking leftovers, then verify in the platform domain screen.',url:'https://help.shopify.com/en/manual/domains'},
+  {id:'kb4',area:'DNS, domains & email',title:'Transactional mail in spam after Google move',body:'One SPF TXT must include every sender. Replacing Google-only or Shopify-only breaks the other. Merge includes, add DKIM, verify the sender, send a test order.',url:'https://help.shopify.com/en/manual/ordering-shipping/email-notifications/email-authentication-spf-dkim'},
+  {id:'kb5',area:'Shopify apps & integrations',title:'App uninstalled but popup remains',body:'Older apps pasted code into the live theme. Uninstall does not remove it. Search theme files, work on a duplicate, then publish.',url:'https://shopify.dev/docs/apps/build/online-store/theme-app-extensions'},
+  {id:'kb6',area:'Security & hacked sites',title:'Fine for me, phishing for clients',body:'Admin cookies can hide a logged-out malware redirect. Check incognito, scan uploads for PHP, remove rogue users, reset passwords, restore clean files on staging first.',url:'https://wordpress.org/documentation/article/faq-my-site-was-hacked/'}
+];
 const CHECKS=[['read','Picked up the buried detail'],['plain','Plain, non-technical English'],['tone','Professional and proactive, no emojis'],['why','Explains the cause and why the work matters'],['next','Clear next steps and timing'],['money','Billing handled (plan, overage or £40/hr estimate)'],['safe','Safe practice (staging, backups, testing)'],['conf','Keeps the hosting provider and internals private']];
 const BANK=[
 {id:'b1',channel:'desk',desk:'Agency desk',p:'WordPress',area:'Performance & caching',client:'Hollybrook Primary School',from:'Joanne Price, Office Manager',subject:'Term dates not updating on the homepage',plan:'Support retainer · 3 hrs/month · 0.5 used',site:'hollybrookprimary.sch.uk · WordPress 6.8 · Divi',pri:'High',bill:'covered',
@@ -312,8 +420,14 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const clone=o=>JSON.parse(JSON.stringify(o));
 const today=()=>new Date().toLocaleDateString('en-CA');
 function shuf(t){for(const q of ['key','dx','fix']){const right=t[q].opts[t[q].a];const o=t[q].opts.slice();for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}t[q].opts=o;t[q].a=o.indexOf(right)}return t}
-function fresh(){return{v:3,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[],seenIds:[]}}
-function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.seenIds))S.seenIds=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={};if(S.v<3)S.v=3}
+function ticketDiff(t){return t.diff||DIFF_BY_ID[t.seed]||DIFF_BY_ID[t.id]||'normal'}
+/* Easy: drop one distractor so triage is clearer; Normal/Hard keep full sets */
+function shapeForDiff(t){t.diff=ticketDiff(t);if(t.diff!=='easy')return t;
+  for(const q of ['key','dx','fix']){if(!t[q]||t[q].opts.length<=3)continue;const right=t[q].opts[t[q].a];const wrong=t[q].opts.filter((_,i)=>i!==t[q].a);wrong.pop();t[q].opts=[right,...wrong];t[q].a=0}
+  return t}
+function prepTicket(raw){const t=shapeForDiff(withChannel(clone(raw)));return shuf(t)}
+function fresh(){return{v:4,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[],seenIds:[]}}
+function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.seenIds))S.seenIds=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={};if(S.v<4)S.v=4;delete S.diff}
 let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
 if(!S||typeof S!=='object')S=fresh();ensureState();
 if(!Array.isArray(S.queue))S.queue=[];
@@ -330,7 +444,7 @@ function uniqSubject(base,client){let s=base,n=0;while(S.seen.includes(s)||S.que
 function domainFrom(client){return client.toLowerCase().replace(/[^a-z0-9]+/g,'').slice(0,18)+'.co.uk'}
 /* Remix a seed ticket with a new client/subject/id so patterns stay teachable but never repeat */
 function mintTicket(preferArea,preferChannel){const pool=BANK.filter(b=>!preferArea||b.area===preferArea);const seed=pick(pool.length?pool:BANK);
-  const t=shuf(withChannel(clone(seed)));const [client,from0]=pick(CLIENTS);
+  const t=prepTicket(seed);const [client,from0]=pick(CLIENTS);
   const from=Math.random()<.5?from0:`${pick(['Jo','Sam','Alex','Pat','Chris','Taylor','Morgan'])} ${pick(['Price','Shah','Reid','Hart','Moss','Blake','Lee'])}, ${pick(ROLES)}`;
   t.id='g'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
   t.client=client;t.from=from;t.channel=preferChannel||seed.channel||pick(['desk','chat','call']);
@@ -340,10 +454,10 @@ function mintTicket(preferArea,preferChannel){const pool=BANK.filter(b=>!preferA
   /* Light body personalisation so chat/call openings feel fresh */
   t.body=String(t.body||'').replace(/\b(Hi Alex|Hello|Morning|hi —|hey —|Alex,)\b/i,t.channel==='chat'?'hi —':t.channel==='call'?'':('Hi,'));
   if(t.channel==='call'&&!/^\s*$/.test(t.body)){/* keep spoken lines */}
-  t.seed=seed.id;return t}
+  t.seed=seed.id;t.diff=ticketDiff(seed);return t}
 function dueAreas(now){const out=[];for(const j of Object.values(S.journal||{})){if(j&&j.dueAt&&j.dueAt<=now&&j.area)out.push({area:j.area,dueAt:j.dueAt,channel:j.channel})}return out.sort((a,b)=>a.dueAt-b.dueAt)}
 function dueCount(){return dueAreas(Date.now()).length}
-function takeUnseenBank(area){const list=BANK.filter(b=>!wasSeen(b)&&(!area||b.area===area));return list.length?shuf(withChannel(clone(pick(list)))):null}
+function takeUnseenBank(area){const list=BANK.filter(b=>!wasSeen(b)&&(!area||b.area===area));return list.length?prepTicket(pick(list)):null}
 function nextTicket(preferArea){const area=preferArea||null;const b=takeUnseenBank(area)||takeUnseenBank(null);if(b)return b;return mintTicket(area||weakest())}
 function buildPractice(limit){limit=limit||6;const now=Date.now();const q=[];
   const push=t=>{if(!t||wasSeen(t)||q.some(x=>x.subject===t.subject||x.id===t.id))return false;q.push(t);return true};
@@ -353,18 +467,36 @@ function buildPractice(limit){limit=limit||6;const now=Date.now();const q=[];
   return q.slice(0,limit)}
 function refillQueue(min){min=min||3;let guard=0;while(S.queue.length<min&&guard++<20){const t=nextTicket(weakest());if(wasSeen(t)||S.queue.some(q=>q.subject===t.subject)){const m=mintTicket(weakest());if(!wasSeen(m)&&!S.queue.some(q=>q.subject===m.subject))S.queue.push(m)}else S.queue.push(t)}}
 if(!S.queue.length){S.queue=buildPractice(6);try{localStorage.setItem('sds-progress',JSON.stringify(S))}catch(e){}}
-else{S.queue=S.queue.map(t=>withChannel(t));refillQueue(3)}
-let cur=S.queue[0]?.id||null;
-/* Phone path: queue → work → score (desktop ignores this; tools stay as tabs inside work) */
+else{S.queue=S.queue.map(t=>{t=withChannel(t);if(!t.diff)t.diff=ticketDiff(t);return t});refillQueue(3)}
+let cur=null;
+/* Desk home by default; ticket shift uses mview queue|work|score */
+let appView='home';
+let kbOpen=null;
 let mview='queue';
 const W={},DONE={};
-function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',chat:[],q:'',start:Date.now(),done:null,err:''})}
+const DESK_VIEWS=new Set(['home','docs','directory','hosting','dns','queue']);
+function isDeskView(v){return DESK_VIEWS.has(v)}
+function setAppView(v){appView=v;document.body.dataset.app=isDeskView(v)?'desk':'ticket';
+  if(v==='queue')mview='queue';
+  if(v==='work'||v==='score')mview=v;
+  const bar=$('#mbar');if(bar)bar.hidden=!isPhone()||isDeskView(appView)||mview==='queue'}
+function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',chat:[],q:'',team:[],teamq:'',escalations:0,conn:{},start:Date.now(),done:null,err:''})}
+function ensureConn(x){if(!x.conn||typeof x.conn!=='object')x.conn={};return x.conn}
+function isConnected(x,tab){return !!(ensureConn(x)[tab]&&x.conn[tab].on)}
+function hasKeyConn(t,x){return isConnected(x,t.keyTool)||x.tools.includes(t.keyTool)}
 function find(id){return S.queue.find(t=>t.id===id)||DONE[id]}
 function isPhone(){return matchMedia('(max-width:760px)').matches}
 function setMview(v){mview=v;document.body.dataset.mview=v;
   const x=cur&&W[cur];document.body.dataset.rstep=(v==='work'&&x&&!x.done&&x.rstep)?x.rstep:'';
-  const bar=$('#mbar');if(bar)bar.hidden=!isPhone()||v==='queue'}
+  if(v==='work'||v==='score'){appView=v;document.body.dataset.app='ticket'}
+  else if(v==='queue'&&!isDeskView(appView)){appView='queue';document.body.dataset.app='desk'}
+  const bar=$('#mbar');if(bar)bar.hidden=!isPhone()||document.body.dataset.app==='desk'||v==='queue'}
 function contactLabel(t){return({desk:'Ticket',chat:'Live chat',call:'Call'})[t.channel||'desk']||'Ticket'}
+function clientDirectory(){const map=new Map();
+  for(const t of S.queue){map.set(t.client,{client:t.client,from:t.from,plan:t.plan,site:t.site,p:t.p,desk:t.desk})}
+  for(const t of Object.values(DONE)){if(t&&t.client&&!map.has(t.client))map.set(t.client,{client:t.client,from:t.from,plan:t.plan,site:t.site,p:t.p,desk:t.desk})}
+  for(const b of BANK){if(!map.has(b.client))map.set(b.client,{client:b.client,from:b.from,plan:b.plan,site:b.site,p:b.p,desk:b.desk})}
+  return [...map.values()].sort((a,b)=>a.client.localeCompare(b.client))}
 function replyLegend(t,who){return({desk:`Email ${who} back`,chat:`Send chat reply to ${who}`,call:`Write ${who} a wrap-up note`})[t.channel||'desk']}
 /* Prefer the first real sentence, not a greeting */
 function ctxSnip(t){const greet=/^(hi|hello|hey|hiya|morning|good morning|afternoon|evening)\b[\s,.!]*/i;
@@ -372,13 +504,39 @@ function ctxSnip(t){const greet=/^(hi|hello|hey|hiya|morning|good morning|aftern
   if(!s)s=String(t.body||'').replace(/\s+/g,' ').replace(greet,'').trim();
   return s.length>110?s.slice(0,109).replace(/\s+\S*$/,'')+'…':s}
 function mctxHTML(t){if(!t)return '';
-  const who=t.from.split(',')[0];const x=W[t.id];
-  const snip=ctxSnip(t);const ch=CH[t.channel||'desk']||'Desk';
-  return `<aside class="mctx" aria-label="Ticket context"><div class="mctx-nav"><button type="button" data-mview="queue">← Queue</button><span class="hintline" id="timer-m">${fmtT((x?.done?x.done.at:Date.now())-(x?.start||Date.now()))}</span></div>
+  const x=W[t.id];const ch=CH[t.channel||'desk']||'Desk';const d=ticketDiff(t);
+  return `<aside class="mctx" aria-label="Ticket context"><div class="mctx-nav"><button type="button" data-act="desk-queue">← Queue</button><span class="hintline" id="timer-m">${fmtT((x?.done?x.done.at:Date.now())-(x?.start||Date.now()))}</span></div>
   <p class="mctx-sub">${esc(t.subject)}</p>
-  <p class="mctx-line"><span class="pri-${esc(t.pri)}">${esc(t.pri)}</span><span>${esc(ch)}</span><span>${esc(t.client)}</span><span>${esc(t.p)}</span></p>
-  <p class="mctx-plan">${esc(t.plan)}</p>
-  <p class="mctx-snip">${esc(who)}: “${esc(snip)}”</p></aside>`}
+  <p class="mctx-line"><span class="pri-${esc(t.pri)}">${esc(t.pri)}</span><span>${esc(DIFF_LABEL[d])}</span><span>${esc(ch)}</span><span>${esc(t.client)}</span></p></aside>`}
+function toast(msg){const el=$('#toast');if(!el||!msg)return;el.textContent=msg;el.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>el.classList.remove('on'),2800)}
+function showClosing(done,label){const el=$('#closing');if(!el){done();return}
+  const card=el.querySelector('.closing-card');if(card)card.innerHTML=`<span class="spin" aria-hidden="true"></span>${esc(label||'Closing ticket…')}`;
+  el.hidden=false;const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;const ms=reduce?0:720;
+  clearTimeout(showClosing._t);showClosing._t=setTimeout(()=>{el.hidden=true;done()},ms)}
+function connectMs(t){const d=ticketDiff(t);return matchMedia('(prefers-reduced-motion:reduce)').matches?0:(d==='easy'?280:d==='hard'?980:620)}
+function verdict(tot){if(tot>=23)return['Shift-ready work','good'];if(tot>=18)return['Solid ticket','good'];if(tot>=13)return['Close — tighten the reply','mid'];if(tot>=8)return['Needs another pass','low'];return['Revisit the fundamentals','low']}
+function siteHost(t){const m=String(t.site||'').match(/([a-z0-9.-]+\.(?:co\.uk|com|org\.uk|sch\.uk|studio))/i);return m?m[1]:'client-site.example'}
+/* Remote session labels — offline theatre around the same evidence strings */
+function connSpec(t,tab){const host=siteHost(t);const shop=t.p==='Shopify';
+  return({site:{name:'Site check',path:`https://${host}/`,method:'HTTPS · private window',verb:'Open remote site',who:`get ${host}`},
+    logs:{name:'Logs',path:`ssh support@${host}`,method:'SSH · managed host',verb:'Connect via SSH',who:`support@${host}`},
+    admin:{name:'Admin',path:shop?`https://${host}/admin`:`https://${host}/wp-admin`,method:shop?'Shopify admin · support login':'WordPress admin · support login',verb:'Sign in to admin',who:'support session'},
+    code:{name:'Code',path:shop?`sftp://${host}/theme`:`sftp://${host}/wp-content`,method:shop?'Theme files · read-only':'SFTP · read-only',verb:'Open remote files',who:'read-only mount'},
+    dns:{name:'DNS & mail',path:`dig ${host} ANY`,method:'DNS console · live lookup',verb:'Run DNS lookup',who:`nslookup ${host}`}}[tab])||{name:'Tool',path:host,method:'Remote session',verb:'Connect',who:host}}
+/* Evidence drawers: connect first, then inspect — tab visit alone does not count as checked */
+function toolPane(t,x,tab){const raw=t.ev[tab]||'Nothing relevant.';const spec=connSpec(t,tab);const on=isConnected(x,tab);
+  const found=hasKeyConn(t,x)&&tab===t.keyTool;
+  const hint={site:'Front-end check: status codes, headers, console and speed.',logs:'Server, PHP and platform logs.',admin:'WordPress or Shopify admin settings, plugins and apps.',code:'Theme and config files.',dns:'DNS records and mail headers.'}[tab]||'';
+  if(!on)return `<div class="tool"><div class="tool-bar"><span class="tool-name">${esc(spec.name)}</span><div class="urlbar"><span class="lock off" aria-hidden="true"></span><span class="urltext">${esc(spec.path)}</span></div></div>
+  <div class="conn-gate"><p class="conn-title">${esc(spec.verb)}</p><p class="conn-meta">${esc(spec.method)} · ${esc(spec.who)}</p>
+  <button type="button" class="btn" data-act="connect" data-conn="${esc(tab)}" ${x.done?'disabled':''}>${esc(spec.verb)}</button>
+  <p class="hintline" style="margin-top:12px">Offline session — same evidence as a real remote desk check.</p></div></div>
+  <p class="tool-note">${esc(hint)}</p>`;
+  return `<div class="tool"><div class="tool-bar"><span class="tool-name">${esc(spec.name)}</span><div class="urlbar"><span class="lock" aria-hidden="true"></span><span class="urltext">${esc(spec.path)}</span></div></div>
+  <div class="sess"><span class="dot" aria-hidden="true"></span><span>Connected</span><span class="sess-path">${esc(spec.who)}</span>
+  <button type="button" class="btn ghost sm" data-act="disconnect" data-conn="${esc(tab)}" ${x.done?'disabled':''}>Disconnect</button></div>
+  <pre class="con">${esc(raw)}</pre></div>
+  <p class="tool-note${found?' found':''}">${found?'Evidence noted — this was the smoking gun.':esc(hint)}</p>`}
 function renderCtx(){const el=$('#ctx');if(!el)return;
   if(!isPhone()||mview==='queue'){el.hidden=true;el.innerHTML='';return}
   const t=find(cur);if(!t){el.hidden=true;el.innerHTML='';return}
@@ -398,15 +556,72 @@ function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:
   const pct=nx?Math.round((n-prev)/(nx[0]-prev)*100):100;const avg=S.max?Math.round(S.sum/S.max*100):0;
   const pay=salaryMid(c);const payLine=c?`~£${pay}k · ${fmtBand(c)} UK`:(nx?`Aiming for ${fmtBand(nx)} UK`:'');
   const due=dueCount();
-  $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>Desk, live chat and phone — practise like a real shift.</p></div>
+  $('#hdr').innerHTML=`<div><h1>Service Desk Simulator</h1><p>Agency desk for WordPress &amp; Shopify — stations, queue and shift work.</p></div>
   <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
   <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${esc(payLine)}${payLine?' · ':''}${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
-  <div class="status">Endless unique tickets · ${S.seen.length} done · ${due?`${due} skill area${due===1?'':'s'} due for fresh practice · `:''}Focus: ${esc(weakest())}.</div>`}
+  <div class="status">${S.queue.length} open · ${S.seen.length} done · ${due?`${due} skill area${due===1?'':'s'} due · `:''}Focus: ${esc(weakest())}.</div>`}
+function renderRail(){const qn=S.queue.length;
+  $('#rail').innerHTML=`<div class="rail-lab">Stations</div>${STATIONS.map(([id,lab])=>{
+    const on=appView===id||(id==='queue'&&(appView==='work'||appView==='score'))?' on':'';
+    const badge=id==='queue'&&qn?`<span class="n">${qn}</span>`:'';
+    return `<button type="button" data-station="${id}" class="${on.trim()}">${esc(lab)}${badge}</button>`}).join('')}`}
+function renderDesk(){const el=$('#desk');if(!el)return;
+  if(!isDeskView(appView)){el.innerHTML='';return}
+  if(appView==='home'){const open=S.queue[0];const c=certFor(S.resolved);
+    el.innerHTML=`<div class="desk-hero"><h2>Agency service desk</h2><p>Not only tickets — use the stations like a real shift: knowledge base, client directory, hosting and DNS, then pull from the queue.</p></div>
+    <div class="station-grid">
+      <button type="button" class="station-card" data-station="queue"><b>Ticket queue</b><span>${S.queue.length} open · mixed difficulty</span></button>
+      <button type="button" class="station-card" data-station="docs"><b>Knowledge base</b><span>${KB.length} SOPs for WP &amp; Shopify</span></button>
+      <button type="button" class="station-card" data-station="directory"><b>Client directory</b><span>Plans, stacks and contacts</span></button>
+      <button type="button" class="station-card" data-station="hosting"><b>Hosting panel</b><span>PHP, disk, restarts (scripted)</span></button>
+      <button type="button" class="station-card" data-station="dns"><b>DNS console</b><span>Lookups without a ticket open</span></button>
+    </div>
+    <h2 style="font-size:17px;margin:0 0 8px">Start here</h2>
+    <div class="mod-list">${MODULES.map(m=>`<button type="button" data-act="mod" data-mod="${esc(m.id)}"><b>${esc(m.title)}</b><span>${m.mins} min · ${esc(m.blurb)}</span></button>`).join('')}</div>
+    <p class="hintline" style="margin-top:14px">${open?`Next in queue: ${esc(open.subject)}`:`Queue empty — pull practice from Ticket queue.`} · Title: ${esc(c?c[1]:'Trainee')}</p>
+    ${open?`<button class="btn" data-open="${esc(open.id)}" style="margin-top:10px">Open next ticket</button>`:`<button class="btn" id="practice" style="margin-top:10px">Today's practice</button>`}`;return}
+  if(appView==='queue'){el.innerHTML=`<div class="desk-hero"><h2>Ticket queue</h2><p>Desk, live chat and phone — scored drills. Open one to enter the shift workbench.</p></div><div id="desk-q"></div><div id="desk-gen"></div>`;
+    const open=S.queue;const host=$('#desk-q'),gen=$('#desk-gen');
+    if(host)host.innerHTML=open.length?open.map(t=>{const d=ticketDiff(t);return `<button class="qitem" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(DIFF_LABEL[d])}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.client)}</span></span></button>`}).join(''):`<p class="empty">Queue clear — pull fresh tickets.</p>`;
+    const due=dueCount();
+    if(gen)gen.innerHTML=`<div class="gen"><p class="hintline">${due?`${due} weak area${due===1?'':'s'} due. `:''}Focus: ${esc(weakest())}. Difficulty is set per ticket.</p>
+    <button class="btn w" id="practice">${open.length?'Add 3 unique tickets':"Today's practice"}</button></div>`;return}
+  if(appView==='docs'){const art=kbOpen&&KB.find(k=>k.id===kbOpen);
+    if(art){el.innerHTML=`<div class="kb-article"><button type="button" class="btn ghost" data-act="kb-back" style="margin-bottom:12px">← All articles</button>
+      <h3>${esc(art.title)}</h3><p class="hintline">${esc(art.area)}</p><p class="body">${esc(art.body)}</p>
+      ${/^https:\/\//.test(art.url||'')?`<p class="note"><a href="${esc(art.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}
+      <button class="btn" data-act="mod" data-mod="${esc(art.area)}" style="margin-top:8px">Practise this area</button></div>`;return}
+    el.innerHTML=`<div class="desk-hero"><h2>Knowledge base</h2><p>Agency SOPs — read first, then drill the matching ticket pattern.</p></div>
+    <div class="kb-list">${KB.map(k=>`<button type="button" data-act="kb" data-kb="${esc(k.id)}"><b>${esc(k.title)}</b><span>${esc(k.area)}</span></button>`).join('')}</div>`;return}
+  if(appView==='directory'){const list=clientDirectory();
+    el.innerHTML=`<div class="desk-hero"><h2>Client directory</h2><p>Who you support, on what plan, and which stack — usable without a ticket open.</p></div>
+    ${list.slice(0,24).map(c=>`<div class="dir-card"><h3>${esc(c.client)}</h3><p class="hintline">${esc(c.from)}</p>
+    <div class="dir-meta"><div><span>Desk</span>${esc(c.desk||'—')}</div><div><span>Platform</span>${esc(c.p||'—')}</div><div><span>Plan</span>${esc(c.plan||'—')}</div><div><span>Site</span>${esc(c.site||'—')}</div></div></div>`).join('')}`;return}
+  if(appView==='hosting'){const t=S.queue[0]||BANK[0];const host=siteHost(t);
+    el.innerHTML=`<div class="desk-hero"><h2>Hosting panel</h2><p>Scripted managed hosting — check PHP, disk and services before you guess at the theme.</p></div>
+    <div class="host-panel"><div class="tool-bar"><span class="tool-name">Hosting</span><div class="urlbar"><span class="lock" aria-hidden="true"></span><span class="urltext">${esc(host)} · control panel</span></div></div>
+    <pre class="con">Account: ${esc(host)}
+PHP version: 8.3 (active)
+Disk: 12.4 GB / 40 GB
+Object cache: Redis · connected
+Last deploy / restore: none in 7 days
+Scheduled: weekly malware scan · OK
+Note: open a ticket and use Logs / Admin for case-specific evidence.</pre></div>
+    <button class="btn" data-station="queue" style="margin-top:12px">Go to ticket queue</button>`;return}
+  if(appView==='dns'){const t=S.queue.find(x=>x.keyTool==='dns')||BANK.find(b=>b.keyTool==='dns')||BANK[0];const host=siteHost(t);
+    el.innerHTML=`<div class="desk-hero"><h2>DNS console</h2><p>Run a lookup any time. Ticket-specific records appear when you connect from a DNS case.</p></div>
+    <div class="dns-panel"><div class="tool-bar"><span class="tool-name">Lookup</span><div class="urlbar"><span class="lock" aria-hidden="true"></span><span class="urltext">dig ${esc(host)}</span></div></div>
+    <pre class="con">${esc(host)}    A       23.227.38.65
+www.${esc(host)}  CNAME   shops.myshopify.com
+${esc(host)}    TXT     "v=spf1 include:_spf.google.com include:shops.shopify.com ~all"
+(Sample records — open a DNS ticket and connect for the smoking-gun set.)</pre></div>
+    <button class="btn" data-station="queue" style="margin-top:12px">Find a DNS ticket</button>`;return}
+  el.innerHTML=''}
 
 function renderQueue(){const open=S.queue;$('#qh').textContent=`Queue · ${open.length} open`;
-  $('#qlist').innerHTML=open.length?open.map(t=>`<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`).join(''):`<p class="empty">Queue clear — pull fresh tickets (never repeats).</p>`;
+  $('#qlist').innerHTML=open.length?open.map(t=>{const d=ticketDiff(t);return `<button class="qitem${t.id===cur?' on':''}" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(DIFF_LABEL[d])}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.p)}</span><span>${esc(t.client)}</span></span></button>`}).join(''):`<p class="empty">Queue clear — pull fresh tickets (never repeats).</p>`;
   const due=dueCount();
-  $('#gen').innerHTML=`<p class="hintline">${due?`${due} weak area${due===1?'':'s'} due — new tickets, same skills. `:''}Focus: ${esc(weakest())}.</p>
+  $('#gen').innerHTML=`<p class="hintline">${due?`${due} weak area${due===1?'':'s'} due — new tickets, same skills. `:''}Focus: ${esc(weakest())}. Difficulty is set per ticket.</p>
   <button class="btn w" id="practice">${open.length?'Add 3 unique tickets':"Today's practice"}</button>`}
 
 function opt(name,val,label,checked){return `<label class="opt"><input type="radio" name="${name}" value="${esc(val)}" ${checked?'checked':''}><span>${esc(label)}</span></label>`}
@@ -435,17 +650,34 @@ function contactPane(t,x){const who=t.from.split(',')[0];const ch=t.channel||'de
   return `${shell}
   <form class="row" id="chatf"><input type="text" id="chatq" maxlength="300" placeholder="Ask ${esc(who.split(' ')[0])} a follow-up" value="${esc(x.q)}" ${askDisabled?'disabled':''}><button class="btn" ${askDisabled?'disabled':''}>Ask</button></form>
   <p class="hintline">${ch==='call'?'Phone channel: ask what they know, then write a wrap-up note in Resolve.':'Live chat: up to 5 questions. Good questions cost nothing.'}</p></div>`}
+/* Team escalate: scripted senior hints — tool nudge, then buried detail; never the full diagnosis */
+function ensureTeam(x){if(!Array.isArray(x.team))x.team=[];if(x.team.length)return;
+  x.team.push({r:'cl',t:"You're in #support. Say what you've checked and where you're stuck — two hints max."})}
+function teamHint(t,n){const tool=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;const d=ticketDiff(t);
+  if(n===1)return d==='hard'?`Start a remote session in ${tool} before you change anything. Don't guess from the contact alone.`:`I'd connect to ${tool} next — the useful evidence for this pattern usually lands there.`;
+  const detail=t.key.opts[t.key.a];
+  return d==='hard'?`Compare what the client describes with what your ${tool} session shows for logged-out visitors or downstream systems. Something won't line up.`:`Hold onto this detail: “${detail}”. Check it in your ${tool} session, then pick your cause.`}
+function teamPane(t,x){ensureTeam(x);const left=Math.max(0,2-(x.escalations||0));const d=ticketDiff(t);const keyed=hasKeyConn(t,x);
+  const cost=!keyed?'Sam will ask you to connect to the key tool before giving hints.':(d==='easy'?'Hints are free on Easy.':(x.escalations?'Team hint used — diagnosis capped at −1 when you resolve.':'Normal/Hard: a hint costs 1 from diagnosis if you were otherwise correct.'));
+  const log=x.team.map(m=>`<div class="bubble ${m.r==='me'?'out':'in'}">${esc(m.t)}<span class="meta-t">${m.r==='cl'?'Sam · Senior':'You'}</span></div>`).join('');
+  const disabled=!!x.done||left===0;
+  return `<div class="sms team"><div class="sms-head"><div class="sms-av" aria-hidden="true">SL</div><div class="sms-who">#support<span>Internal · escalate for a nudge</span></div></div><div class="chatlog">${log}</div>
+  <form class="row" id="teamf"><input type="text" id="teamq" maxlength="300" placeholder="${left?`Escalate (${left} left)…`:'Hints used up'}" value="${esc(x.teamq||'')}" ${disabled?'disabled':''}><button class="btn" ${disabled?'disabled':''}>Escalate</button></form>
+  <p class="team-cost">${esc(cost)}</p></div>`}
 
 function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Pull today's practice when you are ready.</p></div>`;$('#res').innerHTML='';renderMbar();return}
   const x=w(t.id);
   if(x.tab==='notes'||x.tab==='chat')x.tab='ticket';
-  const tabs=TOOLS.map(([k,l])=>{const lab=k==='ticket'?contactLabel(t):l;return `<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)?' seen':''}" data-tab="${k}">${lab}</button>`}).join('');
+  if(!Array.isArray(x.team))x.team=[];if(x.escalations==null)x.escalations=0;
+  const d=ticketDiff(t);
+  const tabs=TOOLS.map(([k,l])=>{const lab=k==='ticket'?contactLabel(t):l;const hit=k===t.keyTool&&x.tools.includes(k)?' hit':'';return `<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)?' seen':''}${hit}" data-tab="${k}">${lab}</button>`}).join('');
   let pane='';
   if(x.tab==='ticket')pane=contactPane(t,x);
-  else pane=`<pre class="con">${esc(t.ev[x.tab]||'Nothing relevant.')}</pre><p class="hintline">${{site:'Front-end check: status codes, headers, console and speed.',logs:'Server, PHP and platform logs.',admin:'WordPress or Shopify admin settings, plugins and apps.',code:'Theme and config files.',dns:'DNS records and mail headers.'}[x.tab]}</p>`;
-  const meta=`<div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Channel</span>${esc(CH[t.channel||'desk'])}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>`;
+  else if(x.tab==='team')pane=teamPane(t,x);
+  else pane=toolPane(t,x,x.tab);
+  const meta=`<div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Channel</span>${esc(CH[t.channel||'desk'])}</div><div><span>Difficulty</span>${esc(DIFF_LABEL[d])}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>`;
   const metaBlock=`<div class="md-meta">${meta}</div>`;
-  $('#work').innerHTML=`<article class="tk"><div class="work-head"><div class="chips"><span class="chip ch">${esc(CH[t.channel||'desk'])}</span><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
+  $('#work').innerHTML=`<article class="tk"><div class="work-head"><div class="chips"><span class="chip ch">${esc(CH[t.channel||'desk'])}</span><span class="chip diff-${esc(d)}">${esc(DIFF_LABEL[d])}</span><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
   <h2>${esc(t.subject)}</h2></div>
   ${metaBlock}
   <div class="tabs" role="tablist">${tabs}</div>${pane}</article>`;
@@ -481,15 +713,18 @@ function renderRes(t,x){
     :`<button class="btn w" id="submit">Send and resolve</button>`}`}
 
 function parts(t,x){const d=Math.abs(PRI.indexOf(x.pri)-PRI.indexOf(t.pri));const kt=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;
+  let dx=x.dx===t.dx.a?4:0;const hintTax=(x.escalations>0&&ticketDiff(t)!=='easy')?1:0;
+  let dxWhy=t.dx.why;if(hintTax&&dx){dx=Math.max(0,dx-hintTax);dxWhy='Team hint used (−1). '+t.dx.why}else if(hintTax&&!dx)dxWhy='Team hint used. '+t.dx.why;
   return[['Spotted the key detail',x.key===t.key.a?3:0,3,x.key===t.key.a?'':'Key detail: '+t.key.opts[t.key.a]],
   ['Priority',d===0?2:d===1?1:0,2,d===0?'':'Expected: '+t.pri],
   ['Billing',x.bill===t.bill?2:0,2,x.bill===t.bill?'':'Expected: '+BILL[t.bill]],
   ['Checked the right tool',x.tools.includes(t.keyTool)?2:0,2,x.tools.includes(t.keyTool)?'':'The evidence was in '+kt],
-  ['Diagnosis',x.dx===t.dx.a?4:0,4,t.dx.why],['First fix',x.fix===t.fix.a?4:0,4,t.fix.why]]}
+  ['Diagnosis',dx,4,dxWhy],['First fix',x.fix===t.fix.a?4:0,4,t.fix.why]]}
 
 function missList(P){return P.filter(p=>p[1]<p[2]).map(p=>({title:p[0],why:p[3]}))}
 
 function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.reduce((a,p)=>a+p[1],0);const tot=base+(rp??0);
+  const [vLabel,vTone]=verdict(tot);
   let replyBlock='';
   if(x.done.state==='self')replyBlock=`<p class="note">Compare your reply with the model below, then tick what yours did.</p>${CHECKS.map(([k,l])=>`<label class="opt"><input type="checkbox" name="self" value="${k}"><span>${esc(l)}</span></label>`).join('')}<button class="btn w desk-submit" id="selfok">Confirm reply score</button>`;
   else if(x.done.state==='learn'){const misses=x.done.misses||[];
@@ -497,11 +732,12 @@ function renderReview(t,x){const P=x.done.parts,rp=x.done.reply;const base=P.red
     ${misses.map(m=>`<div class="note miss"><b>${esc(m.title)}:</b> ${esc(m.why)}</div>`).join('')}
     <p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>
     <button class="btn w desk-submit" id="gotit">Got it — continue</button>`}
+  const promo=x.done.promo?`<div class="promo" role="status"><b>${esc(x.done.promo.title)}</b><span>New title unlocked · ${esc(x.done.promo.band)} UK</span></div>`:'';
   renderCtx();
-  $('#res').innerHTML=`<h2>Score</h2><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
+  $('#res').innerHTML=`${promo}<p class="verdict ${vTone}">${esc(vLabel)}</p><div class="score">${tot}<small style="font-size:22px;color:var(--mute)"> / 25</small></div>
   <table class="parts">${P.map(p=>`<tr><td>${esc(p[0])}${p[1]<p[2]?`<div class="miss note">${esc(p[3])}</div>`:''}</td><td class="${p[1]===p[2]?'hit':'miss'}">${p[1]}/${p[2]}</td></tr>`).join('')}<tr><td>Client reply</td><td>${rp==null?'…':rp+'/8'}</td></tr></table>
   ${replyBlock}
-  <details ${x.done.state==='self'?'open':''}><summary>Model reply</summary><p class="body" style="font-size:15px">${esc(t.model)}</p></details>
+  <details ${x.done.state==='self'?'open':''}><summary>Model reply</summary><p class="model-reply" style="font-size:15px">${esc(t.model)}</p></details>
   ${x.done.state==='final'?`<p class="note"><b>Takeaway:</b> ${esc(t.learn)}</p>${/^https:\/\//.test(t.url||'')?`<p class="note"><a href="${esc(t.url)}" target="_blank" rel="noopener">Read more</a></p>`:''}<button class="btn w desk-submit" id="next">${S.queue.length?'Next ticket':'Finish'}</button>`:''}`}
 
 function renderMbar(){const bar=$('#mbar');if(!bar)return;
@@ -526,21 +762,22 @@ function renderFoot(){const wk=weakest();const due=dueCount();
   $('#foot').innerHTML=`<details class="sheet monly"><summary>Skills, career path and recent tickets</summary><div class="sheet-body foot-inner">${body}</div></details><div class="foot-desk">${body}</div>`}
 
 function render(){
-  if(!cur)mview='queue';
-  else if(isPhone()){
-    const x=W[cur];
-    if(x&&x.done)mview='score';
-    else if(mview==='score')mview='work';
-  }else mview='work';
-  setMview(mview);renderHdr();renderCtx();renderQueue();renderWork();renderFoot();window.scrollTo(0,0)}
+  if(isDeskView(appView)){setAppView(appView);setMview('queue');renderHdr();renderRail();renderDesk();renderCtx();renderMbar();window.scrollTo(0,0);return}
+  if(!cur){setAppView('home');render();return}
+  if(isPhone()){const x=W[cur];if(x&&x.done)mview='score';else if(mview==='score')mview='work'}
+  else if(mview!=='score')mview='work';
+  setMview(mview);document.body.dataset.app='ticket';
+  renderHdr();renderRail();renderCtx();renderQueue();renderWork();renderFoot();window.scrollTo(0,0)}
 
+function goStation(id){if(!STATIONS.some(s=>s[0]===id))return;
+  kbOpen=null;cur=null;setAppView(id);render()}
 function goMview(v){const t=find(cur),x=t&&w(t.id);
-  if(v==='queue'){mview='queue';setMview(mview);renderQueue();renderMbar();window.scrollTo(0,0);return}
-  if(!t)return;
+  if(v==='queue'){cur=null;setAppView('queue');render();return}
+  if(!t){setAppView('queue');render();return}
   if(v==='work'){mview=x&&x.done?'score':'work'}
   else if(v==='score'){if(x&&x.done)mview='score';else return}
   else return;
-  setMview(mview);renderWork();window.scrollTo(0,0)}
+  setAppView(mview);setMview(mview);renderWork();renderRail();renderMbar();window.scrollTo(0,0)}
 
 function recordJournal(t,tot,misses){const days=spacedDays(tot);const dueAt=Date.now()+days*864e5;
   /* Store area/channel only — due practice mints a NEW ticket in that area (never the same subject) */
@@ -548,6 +785,7 @@ function recordJournal(t,tot,misses){const days=spacedDays(tot);const dueAt=Date
   S.journal[key]={score:tot,misses:misses.map(m=>m.title),dueAt,at:Date.now(),area:t.area,channel:t.channel||'desk',n:((S.journal[key]||{}).n||0)+1}}
 
 function finishTicket(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.done.reply||0);
+  const prevCert=certFor(S.resolved);const prevStreak=S.streak||0;
   S.resolved++;S.sum+=tot;S.max+=25;const r=S.areas[t.area]||(S.areas[t.area]={s:0,m:0,n:0});r.s+=tot;r.m+=25;r.n++;
   const d=today();if(S.lastDay!==d){const y=new Date(Date.now()-864e5).toLocaleDateString('en-CA');S.streak=S.lastDay===y?(S.streak||0)+1:1;S.lastDay=d}
   S.hist.unshift({s:t.subject,a:t.area,g:tot,ch:t.channel||'desk',at:Date.now()});S.hist=S.hist.slice(0,60);
@@ -555,19 +793,45 @@ function finishTicket(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.don
   recordJournal(t,tot,x.done.misses||[]);
   DONE[t.id]=t;S.queue=S.queue.filter(q=>q.id!==t.id);
   refillQueue(3);
+  const next=certFor(S.resolved);
+  if(next&&(!prevCert||next[0]!==prevCert[0]))x.done.promo={title:next[1],band:fmtBand(next)};
+  else if((S.streak||0)>prevStreak&&S.streak>=2)toast(`${S.streak}-day streak — keep the shift going`);
   x.done.state='final';save()}
 
 document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
-  if(el.dataset.open){cur=el.dataset.open;w(cur).rstep='triage';mview='work';render();return}
+  if(el.dataset.station){goStation(el.dataset.station);return}
+  if(el.dataset.open){cur=el.dataset.open;w(cur).rstep='triage';setAppView('work');mview='work';render();return}
   if(el.dataset.mview){goMview(el.dataset.mview);return}
   const t=find(cur),x=t&&w(t.id);
   const act=el.dataset.act||el.id;
-  if(el.dataset.tab&&x){x.tab=el.dataset.tab;if(!x.tools.includes(x.tab))x.tools.push(x.tab);renderWork();return}
+  if(act==='desk-queue'){goStation('queue');return}
+  if(act==='kb'&&el.dataset.kb){kbOpen=el.dataset.kb;setAppView('docs');renderDesk();renderRail();return}
+  if(act==='kb-back'){kbOpen=null;renderDesk();return}
+  if(act==='mod'){const mod=MODULES.find(m=>m.id===el.dataset.mod);const area=mod?mod.area:el.dataset.mod;
+    const hit=S.queue.find(q=>q.area===area)||null;
+    if(hit){cur=hit.id;w(cur).rstep='triage';setAppView('work');mview='work';toast('Practise: '+area);render();return}
+    const minted=mintTicket(area);S.queue.unshift(minted);cur=minted.id;w(cur).rstep='triage';setAppView('work');mview='work';save();toast('Fresh drill: '+area);render();return}
+  if(el.dataset.tab&&x){x.tab=el.dataset.tab;
+    /* Contact/Team count as visited; evidence tools only count after a remote connect */
+    if((x.tab==='ticket'||x.tab==='team')&&!x.tools.includes(x.tab))x.tools.push(x.tab);
+    renderWork();return}
+  if(act==='connect'&&t&&x){const tab=el.dataset.conn;if(!tab||tab==='ticket'||tab==='team'||x.done)return;
+    ensureConn(x);if(isConnected(x,tab)){renderWork();return}
+    const spec=connSpec(t,tab);x.tab=tab;const gate=$('#closing');const card=gate&&gate.querySelector('.closing-card');
+    if(card)card.innerHTML=`<span class="spin" aria-hidden="true"></span>Connecting · ${esc(spec.method)}…`;
+    if(gate)gate.hidden=false;clearTimeout(showClosing._t);
+    showClosing._t=setTimeout(()=>{if(gate)gate.hidden=true;ensureConn(x)[tab]={on:true,at:Date.now()};
+      if(!x.tools.includes(tab))x.tools.push(tab);
+      if(tab===t.keyTool)toast('Remote session live — smoking gun drawer');renderWork()},connectMs(t));return}
+  if(act==='disconnect'&&t&&x){const tab=el.dataset.conn;if(!tab||!x.conn?.[tab])return;x.conn[tab].on=false;toast('Session closed');renderWork();return}
   if(act==='practice'){const add=buildPractice(S.queue.length?3:6);for(const t0 of add){if(!S.queue.some(q=>q.id===t0.id||q.subject===t0.subject))S.queue.push(t0)}
-    if(!cur&&S.queue[0])cur=S.queue[0].id;mview=cur?'work':'queue';save();render();return}
+    save();toast(`Added ${add.length} ticket${add.length===1?'':'s'}`);setAppView('queue');render();return}
   if(act==='to-reply'&&t){
     if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';renderRes(t,x);renderMbar();
       if(isPhone()){const a=$('#resolve-anchor');if(a)a.scrollIntoView({behavior:'smooth',block:'start'})}
+      return}
+    if(ticketDiff(t)==='hard'&&!hasKeyConn(t,x)){x.err='Hard: open a remote session on the key evidence tool first.';renderRes(t,x);renderMbar();
+      if(isPhone()){$('#resolve-anchor')?.scrollIntoView({behavior:'smooth',block:'start'})}
       return}
     x.err='';x.rstep='reply';mview='work';setMview(mview);renderWork();window.scrollTo(0,0);return}
   if(act==='to-triage'&&t){x.rstep='triage';mview='work';setMview(mview);renderWork();
@@ -577,26 +841,43 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,[data-op
     if([x.key,x.pri,x.bill,x.dx,x.fix].some(v=>v==null)){x.err='Answer every question first.';x.rstep='triage';mview='work';renderWork();
       if(isPhone()){$('#resolve-anchor')?.scrollIntoView({behavior:'smooth',block:'start'})}
       return}
+    if(ticketDiff(t)==='hard'&&!hasKeyConn(t,x)){x.err='Hard: open a remote session on the key evidence tool first.';x.rstep='triage';mview='work';renderWork();
+      if(isPhone()){$('#resolve-anchor')?.scrollIntoView({behavior:'smooth',block:'start'})}
+      return}
     if(x.reply.trim().length<60){x.err='Write a fuller reply to the client.';x.rstep='reply';mview='work';setMview(mview);renderWork();
       if(isPhone()){requestAnimationFrame(()=>$('#reply')?.scrollIntoView({behavior:'smooth',block:'center'}))}
       return}
-    const P=parts(t,x);x.err='';x.done={parts:P,reply:null,fb:null,misses:missList(P),state:'self',at:Date.now()};mview='score';render();return}
+    const P=parts(t,x);x.err='';x.done={parts:P,reply:null,fb:null,misses:missList(P),state:'self',at:Date.now()};
+    showClosing(()=>{mview='score';render()},'Closing ticket…');return}
   if(act==='selfok'&&t){x.done.reply=[...document.querySelectorAll('input[name=self]:checked')].length;
     if((x.done.misses||[]).length){x.done.state='learn';mview='score';render();return}
     finishTicket(t,x);mview='score';render();return}
   if(act==='gotit'&&t){finishTicket(t,x);mview='score';render();return}
-  if(act==='next'){refillQueue(3);if(S.queue.length){cur=S.queue[0].id;w(cur).rstep='triage';mview='work';render()}else{S.queue=buildPractice(6);cur=S.queue[0]?.id||null;mview=cur?'work':'queue';save();render()}}
+  if(act==='next'){refillQueue(3);if(S.queue.length){cur=S.queue[0].id;w(cur).rstep='triage';setAppView('work');mview='work';render()}else{S.queue=buildPractice(6);save();cur=null;setAppView('queue');render()}}
 });
-document.addEventListener('change',e=>{const t=find(cur);if(!t)return;const x=w(t.id),n=e.target.name,v=e.target.value;
+document.addEventListener('change',e=>{const n=e.target.name,v=e.target.value;
+  const t=find(cur);if(!t)return;const x=w(t.id);
   if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
-document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value});
-document.addEventListener('submit',e=>{if(e.target.id!=='chatf')return;e.preventDefault();const t=find(cur);if(!t)return;const x=w(t.id);
+document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value;if(e.target.id==='teamq')x.teamq=e.target.value});
+document.addEventListener('submit',e=>{
+  if(e.target.id==='teamf'){e.preventDefault();const t=find(cur);if(!t)return;const x=w(t.id);ensureTeam(x);
+    const q=(x.teamq||'').trim();if(!q||x.done||(x.escalations||0)>=2)return;
+    x.team.push({r:'me',t:q});x.teamq='';
+    /* No free answers until a remote session is open on the key tool — does not spend a hint */
+    if(!hasKeyConn(t,x)){const tool=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;
+      x.team.push({r:'cl',t:`Have you connected to ${tool} yet? Open a remote session there first — I can't remote-view for you.`});
+      renderWork();return}
+    x.escalations=(x.escalations||0)+1;
+    x.team.push({r:'cl',t:teamHint(t,x.escalations)});
+    if(x.escalations>=2)x.team.push({r:'cl',t:"That's your two hints — finish triage from the evidence."});
+    renderWork();return}
+  if(e.target.id!=='chatf')return;e.preventDefault();const t=find(cur);if(!t)return;const x=w(t.id);
   const q=(x.q||'').trim();if(!q||x.done)return;if(x.chat.filter(m=>m.r==='me').length>=5)return;
   x.chat.push({r:'me',t:q});x.q='';x.chat.push({r:'cl',t:scriptReply(t,q)});renderWork()});
 const tick=setInterval(()=>{const t=find(cur);if(!t||!W[t.id]||W[t.id].done)return;const s=fmtT(Date.now()-W[t.id].start);
   document.querySelectorAll('#timer,#timer-m').forEach(el=>{el.textContent=s})},1000);
 matchMedia('(max-width:760px)').addEventListener('change',()=>render());
 
-setMview(mview);render();
+setAppView('home');render();
 }
 </script></body></html>
