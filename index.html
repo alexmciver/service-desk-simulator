@@ -240,8 +240,53 @@ ol,ul{margin:0;padding:0;list-style:none}
 .dir-card h3{margin:0 0 6px;font-size:17px}
 .dir-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;font-size:13px;margin-top:8px}
 .dir-meta span{color:var(--mute);display:block;font-size:11px}
-.host-panel,.dns-panel{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);max-width:720px}
-.host-panel .tool-bar,.dns-panel .tool-bar{justify-content:space-between}
+.host-panel,.dns-panel,.mail-trace{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);max-width:900px}
+.host-panel .tool-bar,.dns-panel .tool-bar,.mail-trace .tool-bar{justify-content:space-between}
+.chat-juggle{display:grid;grid-template-columns:minmax(180px,240px) minmax(0,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg);min-height:360px;max-width:960px}
+.chat-side{border-right:1px solid var(--line);background:var(--panel);overflow:auto}
+.chat-side button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:12px;min-height:56px;border-radius:0}
+.chat-side button.on{background:var(--bg);box-shadow:inset 3px 0 0 var(--pr)}
+.chat-side button .who{font-weight:700;font-size:14px;display:block}
+.chat-side button .prev{font-size:12px;color:var(--mute);display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-side button.unread .who::after{content:" ·";color:var(--cr);font-weight:700}
+.chat-main{display:flex;flex-direction:column;min-width:0;padding:12px}
+.chat-main .sms{border:0;box-shadow:none;flex:1;min-height:200px}
+.trace-list{display:grid;gap:8px;padding:12px}
+.trace-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);cursor:pointer;text-align:left;width:100%}
+.trace-row.on{border-color:var(--pr);box-shadow:inset 3px 0 0 var(--pr)}
+.trace-row .tag-bad{color:var(--cr);font-weight:700;font-size:12px}
+.trace-row .tag-ok{color:var(--okg);font-weight:700;font-size:12px}
+@media(max-width:760px){
+  .chat-juggle{grid-template-columns:1fr}
+  .chat-side{display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .chat-side button{flex:0 0 min(70vw,260px);border-bottom:0;border-right:1px solid var(--line)}
+  .trace-row{grid-template-columns:1fr}
+}
+.host-actions{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-top:1px solid var(--line);background:var(--panel)}
+.askchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.askchips button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 12px;min-height:36px;font-size:13px;font-weight:600;color:var(--pr)}
+.askchips button:hover{border-color:var(--pr)}
+.findings{margin:10px 0 0;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;background:var(--panel)}
+.findings b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute);margin:0 0 6px}
+.findings li{font-size:13px;padding:4px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.findings li:last-child{border-bottom:0}
+.findings button{border:0;background:none;color:var(--cr);font-size:12px;font-weight:600;padding:0;min-height:auto}
+.con-lines{margin:0;padding:0;list-style:none;background:var(--con);color:var(--cont);font:13.5px/1.55 ui-monospace,Menlo,Consolas,monospace}
+.con-lines li{padding:6px 16px;border-bottom:1px solid rgba(214,221,232,.08);cursor:pointer}
+.con-lines li:hover,.con-lines li.on{background:rgba(106,170,230,.16)}
+.con-lines li .pin{float:right;opacity:.55;font-size:11px;font-family:var(--sans)}
+.nudge{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 12px;margin:0 0 12px;border-radius:10px;border:1px solid light-dark(#c5d6ea,#2a3a4e);background:light-dark(#f0f6fc,#152030);font-size:14px}
+.nudge .btn.sm{margin:0}
+.tri-prog{font-size:13px;color:var(--mute);margin:0 0 10px;font-weight:600}
+.tri-prog b{color:var(--pr)}
+.vm-card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--bg);margin-bottom:10px}
+.vm-card.new{border-color:var(--pr);box-shadow:inset 3px 0 0 var(--pr)}
+.vm-card .vm-from{font-weight:700;margin:0 0 2px}
+.vm-card .body{font-size:15px;margin:8px 0;max-width:68ch}
+.shift-strip{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0 0 16px;padding:12px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-size:14px}
+.shift-strip b{font-variant-numeric:tabular-nums}
+.mod-list button.done{opacity:.72}
+.mod-list button.done b::after{content:" · done";color:var(--okg);font-size:12px;font-weight:700}
 body[data-app=desk] main,body[data-app=desk] .foot{display:none}
 body[data-app=ticket] .desk{display:none}
 body[data-app=ticket] .shell{border-bottom:0}
@@ -288,7 +333,26 @@ const DIFF_LABEL={easy:'Easy',normal:'Normal',hard:'Hard'};
 /* Seed difficulty — remixed tickets inherit from seed id */
 const DIFF_BY_ID={b1:'easy',b2:'hard',b3:'normal',b4:'normal',b5:'normal',b6:'easy',b7:'hard',b8:'easy',b9:'normal',b10:'normal',b11:'normal',b12:'hard'};
 /* Desk stations — tickets are one inbox among several (agency WP/Shopify) */
-const STATIONS=[['home','Dashboard'],['queue','Ticket queue'],['docs','Knowledge base'],['directory','Client directory'],['hosting','Hosting panel'],['dns','DNS console']];
+const STATIONS=[['home','Dashboard'],['queue','Ticket queue'],['voicemail','Voicemail'],['chats','Company chat'],['docs','Knowledge base'],['directory','Client directory'],['hosting','Hosting panel'],['dns','DNS console'],['mail','Mail trace']];
+const ASK_CHIPS=['When did this start?','Who else can see it?','Did anything change recently?','Can you send a screenshot?','Do you have admin / DNS access?'];
+const VM=[
+  {id:'vm1',from:'Joanne Price',client:'Hollybrook Primary',area:'Performance & caching',seed:'b1',msg:'Hi — leaving a voicemail. Sarah can see the new term dates but parents still see the old ones on the homepage. Please call me back.'},
+  {id:'vm2',from:'Priya Shah',client:'Fenwick & Fold',area:'Plugins & WooCommerce',seed:'b2',msg:'Orders are stuck on Pending payment again and the sale starts soon. Customers are being charged in Stripe. Ring me when you can.'},
+  {id:'vm3',from:'Rachel Moss',client:'Oak & Ember Candles',area:'DNS, domains & email',seed:'b6',msg:'The new domain still sometimes shows the parked page. Instagram announce is tomorrow morning — please help.'},
+  {id:'vm4',from:'Helen Quayle',client:'Northgate Vets',area:'Security & hacked sites',seed:'b7',msg:'Urgent — clients say our site jumps to a pharmacy page. Looks fine on my phone. Treat as compromised.'}
+];
+/* Company chat — juggle several live threads without a ticket open yet */
+const CHATS=[
+  {id:'c1',who:'Tom Reid',client:'Kestrel Outdoor',area:'Shopify apps & integrations',seed:'b4',open:'The old Spinwheel popup is still on the live theme. Can you yank it before Thursday?'},
+  {id:'c2',who:'Lucy Hart',client:'Bramble & Bee',area:'Shopify admin & checkout',seed:'b5',open:'WINTER15 fails for some customers — they all seem to have Sale items. Help?'},
+  {id:'c3',who:'Nia Gethin',client:'Little Beam Studio',area:'DNS, domains & email',seed:'b12',open:'Order emails landing in spam since Google Workspace. SPF maybe?'},
+  {id:'c4',who:'Mark Ellison',client:'Harbour View B&B',area:'Divi & page builders',seed:'b8',open:'On my phone the menu covers Book Now. Guests keep emailing instead of booking.'}
+];
+const MAIL_TRACES=[
+  {id:'mt1',msgId:'<order-8821@littlebeam.studio>',from:'Shopify · orders',to:'customer@gmail.com',subject:'Order #8821 confirmed',status:'spam',spf:'fail',dkim:'fail',area:'DNS, domains & email',seed:'b12',detail:'spf=fail smtp.mailfrom=shops.shopify.com\ndkim=fail (no Shopify CNAME)\nDelivery: Gmail spam folder\nCause hint: SPF only allows Google after Workspace move.'},
+  {id:'mt2',msgId:'<invite@hollybrookprimary.sch.uk>',from:'wp-admin',to:'joanne@hollybrookprimary.sch.uk',subject:'Password reset',status:'delivered',spf:'pass',dkim:'pass',area:'Performance & caching',seed:'b1',detail:'spf=pass\ndkim=pass\nDelivery: inbox\nNo mail issue — look at page cache for the homepage dates.'},
+  {id:'mt3',msgId:'<stripe-wh@fenwickandfold.co.uk>',from:'Stripe webhooks',to:'www endpoint',subject:'payment_intent.succeeded',status:'failed',spf:'n/a',dkim:'n/a',area:'Plugins & WooCommerce',seed:'b2',detail:'HTTP 301 on www webhook URL\nEvents not accepted by WooCommerce\nFix path: update Stripe endpoint to apex, resend.'}
+];
 const MODULES=[
   {id:'m-cache',title:'Your first agency shift',mins:20,blurb:'How a retainer ticket moves from contact → evidence → plain-English reply.',area:'Performance & caching'},
   {id:'m-wh',title:'Payments & webhooks',mins:25,blurb:'Why Stripe/Woo “pending” tickets are usually a URL or redirect problem.',area:'Plugins & WooCommerce'},
@@ -426,8 +490,8 @@ function shapeForDiff(t){t.diff=ticketDiff(t);if(t.diff!=='easy')return t;
   for(const q of ['key','dx','fix']){if(!t[q]||t[q].opts.length<=3)continue;const right=t[q].opts[t[q].a];const wrong=t[q].opts.filter((_,i)=>i!==t[q].a);wrong.pop();t[q].opts=[right,...wrong];t[q].a=0}
   return t}
 function prepTicket(raw){const t=shapeForDiff(withChannel(clone(raw)));return shuf(t)}
-function fresh(){return{v:4,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[],seenIds:[]}}
-function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.seenIds))S.seenIds=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={};if(S.v<4)S.v=4;delete S.diff}
+function fresh(){return{v:6,resolved:0,sum:0,max:0,streak:0,lastDay:'',areas:{},hist:[],journal:{},queue:[],seen:[],seenIds:[],vm:[],mods:{},hostLog:[],shiftStart:Date.now(),chats:{},mailSeen:[]}}
+function ensureState(){if(!S.journal||typeof S.journal!=='object')S.journal={};if(!Array.isArray(S.seen))S.seen=[];if(!Array.isArray(S.seenIds))S.seenIds=[];if(!Array.isArray(S.hist))S.hist=[];if(!S.areas)S.areas={};if(!Array.isArray(S.vm))S.vm=[];if(!S.mods||typeof S.mods!=='object')S.mods={};if(!Array.isArray(S.hostLog))S.hostLog=[];if(!S.chats||typeof S.chats!=='object')S.chats={};if(!Array.isArray(S.mailSeen))S.mailSeen=[];if(!S.shiftStart)S.shiftStart=Date.now();if(S.v<6)S.v=6;delete S.diff}
 let S=null;try{S=JSON.parse(localStorage.getItem('sds-progress'))}catch(e){}
 if(!S||typeof S!=='object')S=fresh();ensureState();
 if(!Array.isArray(S.queue))S.queue=[];
@@ -472,15 +536,31 @@ let cur=null;
 /* Desk home by default; ticket shift uses mview queue|work|score */
 let appView='home';
 let kbOpen=null;
+let chatFocus=CHATS[0]?.id||null;
+let mailFocus=MAIL_TRACES[0]?.id||null;
+let deskChatQ='';
 let mview='queue';
 const W={},DONE={};
-const DESK_VIEWS=new Set(['home','docs','directory','hosting','dns','queue']);
+const DESK_VIEWS=new Set(['home','docs','directory','hosting','dns','queue','voicemail','chats','mail']);
 function isDeskView(v){return DESK_VIEWS.has(v)}
 function setAppView(v){appView=v;document.body.dataset.app=isDeskView(v)?'desk':'ticket';
   if(v==='queue')mview='queue';
   if(v==='work'||v==='score')mview=v;
   const bar=$('#mbar');if(bar)bar.hidden=!isPhone()||isDeskView(appView)||mview==='queue'}
-function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',chat:[],q:'',team:[],teamq:'',escalations:0,conn:{},start:Date.now(),done:null,err:''})}
+function w(id){return W[id]||(W[id]={key:null,pri:null,bill:null,dx:null,fix:null,reply:'',tools:['ticket'],tab:'ticket',rstep:'triage',chat:[],q:'',team:[],teamq:'',escalations:0,conn:{},findings:[],start:Date.now(),done:null,err:''})}
+function vmUnread(){return VM.filter(v=>!S.vm.includes(v.id)).length}
+function ensureDeskChat(id){const c=CHATS.find(x=>x.id===id);if(!c)return null;
+  if(!S.chats[id])S.chats[id]={msgs:[{r:'cl',t:c.open}],unread:1,q:''};
+  return S.chats[id]}
+function chatUnread(){let n=0;for(const c of CHATS){const st=S.chats[c.id];if(!st||st.unread)n++}return n}
+function deskChatReply(c,q){const ql=q.toLowerCase();
+  if(/when|start|thursday|sale|morning|spam|google/.test(ql))return"It started after the last change we made — happy to jump on a ticket if you open one from here.";
+  if(/access|admin|login|dns|cloudflare|screenshot/.test(ql))return"I can send access or a screenshot — open the related ticket and I'll stick with you there.";
+  if(/theme|popup|discount|spf|menu|book/.test(ql))return"Yep that's still happening on my side. If you open the drill I'll stay in chat.";
+  return"Thanks — can you open the matching ticket from this thread so we can triage properly?"}
+function shiftClock(){return fmtT(Date.now()-(S.shiftStart||Date.now()))}
+function triageDone(x){return ['key','pri','bill','dx','fix'].filter(k=>x[k]!=null).length}
+function relatedKb(area){return KB.find(k=>k.area===area)||null}
 function ensureConn(x){if(!x.conn||typeof x.conn!=='object')x.conn={};return x.conn}
 function isConnected(x,tab){return !!(ensureConn(x)[tab]&&x.conn[tab].on)}
 function hasKeyConn(t,x){return isConnected(x,t.keyTool)||x.tools.includes(t.keyTool)}
@@ -532,11 +612,16 @@ function toolPane(t,x,tab){const raw=t.ev[tab]||'Nothing relevant.';const spec=c
   <button type="button" class="btn" data-act="connect" data-conn="${esc(tab)}" ${x.done?'disabled':''}>${esc(spec.verb)}</button>
   <p class="hintline" style="margin-top:12px">Offline session — same evidence as a real remote desk check.</p></div></div>
   <p class="tool-note">${esc(hint)}</p>`;
+  if(!Array.isArray(x.findings))x.findings=[];
+  const lines=String(raw).split('\n').map(s=>s.trim()).filter(Boolean);
+  const pinned=new Set(x.findings.filter(f=>f.tab===tab).map(f=>f.line));
+  const list=lines.map((line,i)=>`<li class="${pinned.has(line)?'on':''}" data-act="pin" data-conn="${esc(tab)}" data-li="${i}">${esc(line)}${pinned.has(line)?'<span class="pin">pinned</span>':''}</li>`).join('');
+  const finds=x.findings.length?`<div class="findings"><b>Pinned findings</b><ul>${x.findings.map((f,i)=>`<li><span>${esc(f.tab)}: ${esc(f.line)}</span><button type="button" data-act="unpin" data-i="${i}">Remove</button></li>`).join('')}</ul></div>`:'';
   return `<div class="tool"><div class="tool-bar"><span class="tool-name">${esc(spec.name)}</span><div class="urlbar"><span class="lock" aria-hidden="true"></span><span class="urltext">${esc(spec.path)}</span></div></div>
   <div class="sess"><span class="dot" aria-hidden="true"></span><span>Connected</span><span class="sess-path">${esc(spec.who)}</span>
   <button type="button" class="btn ghost sm" data-act="disconnect" data-conn="${esc(tab)}" ${x.done?'disabled':''}>Disconnect</button></div>
-  <pre class="con">${esc(raw)}</pre></div>
-  <p class="tool-note${found?' found':''}">${found?'Evidence noted — this was the smoking gun.':esc(hint)}</p>`}
+  <ul class="con-lines" aria-label="Evidence lines — click to pin">${list}</ul></div>
+  <p class="tool-note${found?' found':''}">${found?'Evidence noted — this was the smoking gun. Click lines to pin findings.':esc(hint)+' Click a line to pin it.'}</p>${finds}`}
 function renderCtx(){const el=$('#ctx');if(!el)return;
   if(!isPhone()||mview==='queue'){el.hidden=true;el.innerHTML='';return}
   const t=find(cur);if(!t){el.hidden=true;el.innerHTML='';return}
@@ -560,26 +645,82 @@ function renderHdr(){const n=S.resolved,c=certFor(n),nx=nextCert(n),prev=c?c[0]:
   <div class="stats"><div class="stat"><b>${n}</b><span>resolved</span></div><div class="stat"><b>${avg}%</b><span>average score</span></div><div class="stat"><b>${S.streak||0}</b><span>day streak</span></div>
   <div class="stat cert"><b>${esc(c?c[1]:'Trainee')}</b><span>${esc(payLine)}${payLine?' · ':''}${nx?`${nx[0]-n} more to ${esc(nx[1])}`:'Top certificate earned'}</span><div class="meter"><i style="width:${pct}%"></i></div></div></div>
   <div class="status">${S.queue.length} open · ${S.seen.length} done · ${due?`${due} skill area${due===1?'':'s'} due · `:''}Focus: ${esc(weakest())}.</div>`}
-function renderRail(){const qn=S.queue.length;
+function renderRail(){const qn=S.queue.length;const vn=vmUnread();const cn=chatUnread();
   $('#rail').innerHTML=`<div class="rail-lab">Stations</div>${STATIONS.map(([id,lab])=>{
     const on=appView===id||(id==='queue'&&(appView==='work'||appView==='score'))?' on':'';
-    const badge=id==='queue'&&qn?`<span class="n">${qn}</span>`:'';
+    let badge='';
+    if(id==='queue'&&qn)badge=`<span class="n">${qn}</span>`;
+    else if(id==='voicemail'&&vn)badge=`<span class="n">${vn}</span>`;
+    else if(id==='chats'&&cn)badge=`<span class="n">${cn}</span>`;
     return `<button type="button" data-station="${id}" class="${on.trim()}">${esc(lab)}${badge}</button>`}).join('')}`}
 function renderDesk(){const el=$('#desk');if(!el)return;
   if(!isDeskView(appView)){el.innerHTML='';return}
-  if(appView==='home'){const open=S.queue[0];const c=certFor(S.resolved);
-    el.innerHTML=`<div class="desk-hero"><h2>Agency service desk</h2><p>Not only tickets — use the stations like a real shift: knowledge base, client directory, hosting and DNS, then pull from the queue.</p></div>
+  if(appView==='home'){const open=S.queue[0];const c=certFor(S.resolved);const vn=vmUnread();const cn=chatUnread();
+    el.innerHTML=`<div class="desk-hero"><h2>Agency service desk</h2><p>Stations first — chat, voicemail, mail trace, hosting — then the scored ticket queue.</p></div>
+    <div class="shift-strip"><span>Shift <b id="shift-clock">${esc(shiftClock())}</b></span><span>Queue <b>${S.queue.length}</b></span><span>Chat <b>${cn}</b></span><span>Voicemail <b>${vn}</b></span><span>Focus <b>${esc(weakest())}</b></span><span>${esc(c?c[1]:'Trainee')}</span></div>
     <div class="station-grid">
       <button type="button" class="station-card" data-station="queue"><b>Ticket queue</b><span>${S.queue.length} open · mixed difficulty</span></button>
+      <button type="button" class="station-card" data-station="chats"><b>Company chat</b><span>${cn?cn+' waiting':'All threads quiet'}</span></button>
+      <button type="button" class="station-card" data-station="voicemail"><b>Voicemail</b><span>${vn?vn+' new messages':'Inbox clear'}</span></button>
+      <button type="button" class="station-card" data-station="mail"><b>Mail trace</b><span>${MAIL_TRACES.length} recent deliveries</span></button>
       <button type="button" class="station-card" data-station="docs"><b>Knowledge base</b><span>${KB.length} SOPs for WP &amp; Shopify</span></button>
       <button type="button" class="station-card" data-station="directory"><b>Client directory</b><span>Plans, stacks and contacts</span></button>
       <button type="button" class="station-card" data-station="hosting"><b>Hosting panel</b><span>PHP, disk, restarts (scripted)</span></button>
       <button type="button" class="station-card" data-station="dns"><b>DNS console</b><span>Lookups without a ticket open</span></button>
     </div>
     <h2 style="font-size:17px;margin:0 0 8px">Start here</h2>
-    <div class="mod-list">${MODULES.map(m=>`<button type="button" data-act="mod" data-mod="${esc(m.id)}"><b>${esc(m.title)}</b><span>${m.mins} min · ${esc(m.blurb)}</span></button>`).join('')}</div>
-    <p class="hintline" style="margin-top:14px">${open?`Next in queue: ${esc(open.subject)}`:`Queue empty — pull practice from Ticket queue.`} · Title: ${esc(c?c[1]:'Trainee')}</p>
-    ${open?`<button class="btn" data-open="${esc(open.id)}" style="margin-top:10px">Open next ticket</button>`:`<button class="btn" id="practice" style="margin-top:10px">Today's practice</button>`}`;return}
+    <div class="mod-list">${MODULES.map(m=>`<button type="button" class="${S.mods[m.id]?'done':''}" data-act="mod" data-mod="${esc(m.id)}"><b>${esc(m.title)}</b><span>${m.mins} min · ${esc(m.blurb)}</span></button>`).join('')}</div>
+    <p class="hintline" style="margin-top:14px">${open?`Next in queue: ${esc(open.subject)}`:`Queue empty — pull practice from Ticket queue.`}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+    ${cn?`<button class="btn ghost" data-station="chats">Open chats</button>`:''}
+    ${vn?`<button class="btn ghost" data-station="voicemail">Check voicemail</button>`:''}
+    ${open?`<button class="btn" data-open="${esc(open.id)}">Open next ticket</button>`:`<button class="btn" id="practice">Today's practice</button>`}
+    </div>`;return}
+  if(appView==='chats'){
+    if(!chatFocus||!CHATS.some(c=>c.id===chatFocus))chatFocus=CHATS[0].id;
+    const active=CHATS.find(c=>c.id===chatFocus);const st=ensureDeskChat(chatFocus);
+    st.unread=0;
+    const side=CHATS.map(c=>{const s=ensureDeskChat(c.id);const last=s.msgs[s.msgs.length-1];
+      return `<button type="button" class="${c.id===chatFocus?'on':''}${s.unread?' unread':''}" data-act="chat-focus" data-chat="${esc(c.id)}"><span class="who">${esc(c.who)}</span><span class="prev">${esc(c.client)} · ${esc((last&&last.t)||c.open).slice(0,48)}</span></button>`}).join('');
+    const log=st.msgs.map(m=>`<div class="bubble ${m.r==='me'?'out':'in'}">${esc(m.t)}<span class="meta-t">${m.r==='cl'?esc(active.who):'You'}</span></div>`).join('');
+    el.innerHTML=`<div class="desk-hero"><h2>Company chat</h2><p>Juggle live client threads — reply here, then open the matching drill when you are ready to triage.</p></div>
+    <div class="chat-juggle"><div class="chat-side">${side}</div><div class="chat-main">
+      <div class="sms"><div class="sms-head"><div class="sms-av" aria-hidden="true">${esc(initials(active.who))}</div><div class="sms-who">${esc(active.who)}<span>${esc(active.client)} · ${esc(active.area)}</span></div></div>
+      <div class="chatlog">${log}</div></div>
+      <form class="row" id="deskchatf" style="margin-top:10px"><input type="text" id="deskchatq" maxlength="300" placeholder="Reply to ${esc(active.who.split(' ')[0])}…" value="${esc(deskChatQ)}"><button class="btn">Send</button></form>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+        <button type="button" class="btn" data-act="chat-ticket" data-chat="${esc(active.id)}">Open related ticket</button>
+        <button type="button" class="btn ghost" data-act="chat-bump" data-chat="${esc(active.id)}">Simulate inbound ping</button>
+      </div>
+      <p class="hintline" style="margin-top:8px">Unread threads stay badged in the rail until you open them.</p>
+    </div></div>`;return}
+  if(appView==='mail'){
+    if(!mailFocus||!MAIL_TRACES.some(m=>m.id===mailFocus))mailFocus=MAIL_TRACES[0].id;
+    const tr=MAIL_TRACES.find(m=>m.id===mailFocus);
+    if(!S.mailSeen.includes(tr.id))S.mailSeen.push(tr.id);
+    const rows=MAIL_TRACES.map(m=>`<button type="button" class="trace-row${m.id===mailFocus?' on':''}" data-act="mail-focus" data-mail="${esc(m.id)}">
+      <span><b>${esc(m.subject)}</b><br><span class="hintline">${esc(m.from)} → ${esc(m.to)}</span></span>
+      <span class="hintline">${esc(m.msgId)}</span>
+      <span class="${m.status==='delivered'?'tag-ok':'tag-bad'}">${esc(m.status.toUpperCase())}</span></button>`).join('');
+    el.innerHTML=`<div class="desk-hero"><h2>Mail trace</h2><p>Where did the message go? SPF/DKIM and delivery path — same skill as agency mail tickets.</p></div>
+    <div class="mail-trace"><div class="tool-bar"><span class="tool-name">Recent traces</span><div class="urlbar"><span class="lock" aria-hidden="true"></span><span class="urltext">message-trace · last 24h</span></div></div>
+    <div class="trace-list">${rows}</div>
+    <pre class="con">Message: ${esc(tr.msgId)}
+Subject: ${esc(tr.subject)}
+SPF: ${esc(tr.spf)} · DKIM: ${esc(tr.dkim)} · Status: ${esc(tr.status)}
+
+${esc(tr.detail)}</pre>
+    <div class="host-actions">
+      <button type="button" class="btn sm" data-act="mail-ticket" data-mail="${esc(tr.id)}">Open related ticket</button>
+      <button type="button" class="btn sm ghost" data-station="dns">Open DNS console</button>
+      <button type="button" class="btn sm ghost" data-act="mod" data-mod="m-dns">Practise DNS &amp; mail</button>
+    </div></div>`;return}
+  if(appView==='voicemail'){
+    el.innerHTML=`<div class="desk-hero"><h2>Voicemail</h2><p>Half the facts, no ticket yet — listen, then open a matching drill.</p></div>
+    ${VM.map(v=>{const heard=S.vm.includes(v.id);return `<article class="vm-card${heard?'':' new'}"><p class="vm-from">${esc(v.from)} · ${esc(v.client)}</p>
+    <p class="hintline">${esc(v.area)}${heard?' · listened':''}</p>
+    <p class="body">“${esc(v.msg)}”</p>
+    <button type="button" class="btn" data-act="vm-open" data-vm="${esc(v.id)}">${heard?'Open related ticket':'Listen & open ticket'}</button></article>`}).join('')}`;return}
   if(appView==='queue'){el.innerHTML=`<div class="desk-hero"><h2>Ticket queue</h2><p>Desk, live chat and phone — scored drills. Open one to enter the shift workbench.</p></div><div id="desk-q"></div><div id="desk-gen"></div>`;
     const open=S.queue;const host=$('#desk-q'),gen=$('#desk-gen');
     if(host)host.innerHTML=open.length?open.map(t=>{const d=ticketDiff(t);return `<button class="qitem" data-open="${esc(t.id)}"><span class="s">${esc(t.subject)}</span><span class="m"><span class="pri-${esc(t.pri)}">${W[t.id]?'In progress':'New'}</span><span>${esc(DIFF_LABEL[d])}</span><span>${esc(CH[t.channel||'desk']||'Desk')}</span><span>${esc(t.client)}</span></span></button>`}).join(''):`<p class="empty">Queue clear — pull fresh tickets.</p>`;
@@ -597,8 +738,8 @@ function renderDesk(){const el=$('#desk');if(!el)return;
     el.innerHTML=`<div class="desk-hero"><h2>Client directory</h2><p>Who you support, on what plan, and which stack — usable without a ticket open.</p></div>
     ${list.slice(0,24).map(c=>`<div class="dir-card"><h3>${esc(c.client)}</h3><p class="hintline">${esc(c.from)}</p>
     <div class="dir-meta"><div><span>Desk</span>${esc(c.desk||'—')}</div><div><span>Platform</span>${esc(c.p||'—')}</div><div><span>Plan</span>${esc(c.plan||'—')}</div><div><span>Site</span>${esc(c.site||'—')}</div></div></div>`).join('')}`;return}
-  if(appView==='hosting'){const t=S.queue[0]||BANK[0];const host=siteHost(t);
-    el.innerHTML=`<div class="desk-hero"><h2>Hosting panel</h2><p>Scripted managed hosting — check PHP, disk and services before you guess at the theme.</p></div>
+  if(appView==='hosting'){const t=S.queue[0]||BANK[0];const host=siteHost(t);const log=(S.hostLog||[]).slice(-8).map(l=>esc(l)).join('\n')||'No actions yet this shift.';
+    el.innerHTML=`<div class="desk-hero"><h2>Hosting panel</h2><p>Scripted managed hosting — run safe actions, then jump to the ticket tools for case evidence.</p></div>
     <div class="host-panel"><div class="tool-bar"><span class="tool-name">Hosting</span><div class="urlbar"><span class="lock" aria-hidden="true"></span><span class="urltext">${esc(host)} · control panel</span></div></div>
     <pre class="con">Account: ${esc(host)}
 PHP version: 8.3 (active)
@@ -606,7 +747,14 @@ Disk: 12.4 GB / 40 GB
 Object cache: Redis · connected
 Last deploy / restore: none in 7 days
 Scheduled: weekly malware scan · OK
-Note: open a ticket and use Logs / Admin for case-specific evidence.</pre></div>
+
+Activity log
+${log}</pre>
+    <div class="host-actions">
+      <button type="button" class="btn sm" data-act="host" data-host="php">Restart PHP-FPM</button>
+      <button type="button" class="btn sm ghost" data-act="host" data-host="cache">Flush object cache</button>
+      <button type="button" class="btn sm ghost" data-act="host" data-host="scan">Run malware scan</button>
+    </div></div>
     <button class="btn" data-station="queue" style="margin-top:12px">Go to ticket queue</button>`;return}
   if(appView==='dns'){const t=S.queue.find(x=>x.keyTool==='dns')||BANK.find(b=>b.keyTool==='dns')||BANK[0];const host=siteHost(t);
     el.innerHTML=`<div class="desk-hero"><h2>DNS console</h2><p>Run a lookup any time. Ticket-specific records appear when you connect from a DNS case.</p></div>
@@ -641,15 +789,19 @@ function ensureChat(t,x){if(x.chat.length)return;const who=t.from.split(',')[0];
   for(const p of smsParts(t.body))x.chat.push({r:'cl',t:p});
   if(t.channel==='call')x.chat.push({r:'cl',t:`(On the phone) ${who} is waiting — ask anything they'd know.`})}
 function contactPane(t,x){const who=t.from.split(',')[0];const ch=t.channel||'desk';
-  if(ch==='desk')return `<div class="mail"><div class="mail-h"><div><span>From </span><b>${esc(t.from)}</b></div><div><span>Subject </span><b>${esc(t.subject)}</b></div><div><span>Channel </span><b>Desk · email</b></div></div><div class="body">${esc(t.body)}</div></div><p class="hintline">Read the email, then check the evidence tools before you triage.</p>`;
+  const tool=TOOLS.find(z=>z[0]===t.keyTool)?.[1]||t.keyTool;
+  const nudge=!hasKeyConn(t,x)&&!x.done?`<div class="nudge"><span>Next: open a remote session in <b>${esc(tool)}</b></span><button type="button" class="btn sm" data-tab="${esc(t.keyTool)}">Go to ${esc(tool)}</button></div>`:'';
+  if(ch==='desk')return `${nudge}<div class="mail"><div class="mail-h"><div><span>From </span><b>${esc(t.from)}</b></div><div><span>Subject </span><b>${esc(t.subject)}</b></div><div><span>Channel </span><b>Desk · email</b></div></div><div class="body">${esc(t.body)}</div></div><p class="hintline">Read the email, then connect to the evidence tools before you triage.</p>`;
   ensureChat(t,x);
   const label=ch==='call'?'Phone':'Live chat';
   const log=x.chat.map(m=>`<div class="bubble ${m.r==='me'?'out':'in'}">${esc(m.t)}${m.r==='cl'?`<span class="meta-t">${esc(who)}</span>`:'<span class="meta-t">You</span>'}</div>`).join('');
   const askDisabled=x.chat.filter(m=>m.r==='me').length>=5||x.done;
+  const chips=!askDisabled?`<div class="askchips">${ASK_CHIPS.map(c=>`<button type="button" data-act="askchip" data-q="${esc(c)}">${esc(c)}</button>`).join('')}</div>`:'';
   const shell=ch==='call'?`<div class="call"><div class="call-bar"><span class="dot" aria-hidden="true"></span>Connected · ${esc(who)} · Phone</div>${threadHead(t,label)}<div class="chatlog">${log}</div>`:`<div class="sms">${threadHead(t,label)}<div class="chatlog">${log}</div>`;
-  return `${shell}
+  return `${nudge}${shell}
   <form class="row" id="chatf"><input type="text" id="chatq" maxlength="300" placeholder="Ask ${esc(who.split(' ')[0])} a follow-up" value="${esc(x.q)}" ${askDisabled?'disabled':''}><button class="btn" ${askDisabled?'disabled':''}>Ask</button></form>
-  <p class="hintline">${ch==='call'?'Phone channel: ask what they know, then write a wrap-up note in Resolve.':'Live chat: up to 5 questions. Good questions cost nothing.'}</p></div>`}
+  ${chips}
+  <p class="hintline">${ch==='call'?'Phone channel: ask what they know, then write a wrap-up note in Resolve.':'Live chat: up to 5 questions. Tap a chip or type your own.'}</p></div>`}
 /* Team escalate: scripted senior hints — tool nudge, then buried detail; never the full diagnosis */
 function ensureTeam(x){if(!Array.isArray(x.team))x.team=[];if(x.team.length)return;
   x.team.push({r:'cl',t:"You're in #support. Say what you've checked and where you're stuck — two hints max."})}
@@ -668,8 +820,8 @@ function teamPane(t,x){ensureTeam(x);const left=Math.max(0,2-(x.escalations||0))
 function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class="empty"><h2>No ticket open</h2><p>Pull today's practice when you are ready.</p></div>`;$('#res').innerHTML='';renderMbar();return}
   const x=w(t.id);
   if(x.tab==='notes'||x.tab==='chat')x.tab='ticket';
-  if(!Array.isArray(x.team))x.team=[];if(x.escalations==null)x.escalations=0;
-  const d=ticketDiff(t);
+  if(!Array.isArray(x.team))x.team=[];if(!Array.isArray(x.findings))x.findings=[];if(x.escalations==null)x.escalations=0;
+  const d=ticketDiff(t);const kb=relatedKb(t.area);
   const tabs=TOOLS.map(([k,l])=>{const lab=k==='ticket'?contactLabel(t):l;const hit=k===t.keyTool&&x.tools.includes(k)?' hit':'';return `<button class="tab${x.tab===k?' on':''}${x.tools.includes(k)?' seen':''}${hit}" data-tab="${k}">${lab}</button>`}).join('');
   let pane='';
   if(x.tab==='ticket')pane=contactPane(t,x);
@@ -677,8 +829,9 @@ function renderWork(){const t=find(cur);if(!t){$('#work').innerHTML=`<div class=
   else pane=toolPane(t,x,x.tab);
   const meta=`<div class="meta"><div><span>From</span>${esc(t.from)}</div><div><span>Client</span>${esc(t.client)}</div><div><span>Channel</span>${esc(CH[t.channel||'desk'])}</div><div><span>Difficulty</span>${esc(DIFF_LABEL[d])}</div><div><span>Plan</span>${esc(t.plan)}</div><div><span>Site</span>${esc(t.site)}</div><div><span>Time on ticket</span><b id="timer">${fmtT((x.done?x.done.at:Date.now())-x.start)}</b></div></div>`;
   const metaBlock=`<div class="md-meta">${meta}</div>`;
+  const kbLink=kb&&!x.done?`<p class="hintline">KB: <button type="button" class="btn ghost sm" data-act="kb" data-kb="${esc(kb.id)}" style="min-height:32px;padding:2px 10px;display:inline-flex;margin-left:4px">${esc(kb.title)}</button></p>`:'';
   $('#work').innerHTML=`<article class="tk"><div class="work-head"><div class="chips"><span class="chip ch">${esc(CH[t.channel||'desk'])}</span><span class="chip diff-${esc(d)}">${esc(DIFF_LABEL[d])}</span><span class="chip">${esc(t.desk)}</span><span class="chip">${esc(t.p)}</span><span class="chip">${esc(t.area)}</span></div>
-  <h2>${esc(t.subject)}</h2></div>
+  <h2>${esc(t.subject)}</h2>${kbLink}</div>
   ${metaBlock}
   <div class="tabs" role="tablist">${tabs}</div>${pane}</article>`;
   renderCtx();renderRes(t,x);renderMbar()}
@@ -687,16 +840,19 @@ function renderRes(t,x){
   if(x.done){renderReview(t,x);return}
   if(!x.rstep)x.rstep='triage';
   const who=t.from.split(',')[0];
-  const triage=`<fieldset><legend>1. Which detail matters most?</legend>${t.key.opts.map((o,i)=>opt('key',i,o,x.key===i)).join('')}</fieldset>
+  const doneN=triageDone(x);
+  const prog=`<p class="tri-prog" id="tri-prog"><b>${doneN}</b> of 5 triage answers locked in</p>`;
+  const triage=`${prog}<fieldset><legend>1. Which detail matters most?</legend>${t.key.opts.map((o,i)=>opt('key',i,o,x.key===i)).join('')}</fieldset>
   <fieldset><legend>2. Priority</legend><div class="seg">${PRI.map(p=>opt('pri',p,p,x.pri===p)).join('')}</div></fieldset>
   <fieldset><legend>3. Billing</legend>${Object.entries(BILL).map(([k,l])=>opt('bill',k,l,x.bill===k)).join('')}</fieldset>
   <fieldset><legend>4. Most likely cause</legend>${t.dx.opts.map((o,i)=>opt('dx',i,o,x.dx===i)).join('')}</fieldset>
   <fieldset><legend>5. First fix</legend>${t.fix.opts.map((o,i)=>opt('fix',i,o,x.fix===i)).join('')}</fieldset>`;
   const first=who.split(/\s+/)[0]||who;
   const ph=({desk:'Hi '+first+', …',chat:'Quick reply as you would in chat…',call:'Hi '+first+', thanks for your time on the call…'})[t.channel||'desk'];
+  const pins=(x.findings||[]).length?`<p class="hintline">${x.findings.length} finding${x.findings.length===1?'':'s'} pinned from evidence — use them in your reply.</p>`:'';
   const compose=`<div class="sms-compose"><label class="hintline" for="reply">${esc(replyLegend(t,who))}</label>
   <textarea id="reply" maxlength="4000" placeholder="${esc(ph)}">${esc(x.reply)}</textarea>
-  <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div></div>`;
+  <div class="sendrow"><p class="hintline">Plain English, billing clear, no emojis.</p></div>${pins}</div>`;
   const replyPhone=compose;
   const replyDesk=`<fieldset><legend>6. ${esc(replyLegend(t,who))}</legend>${compose}</fieldset>`;
   const phoneSplit=isPhone();
@@ -798,16 +954,52 @@ function finishTicket(t,x){const tot=x.done.parts.reduce((a,p)=>a+p[1],0)+(x.don
   else if((S.streak||0)>prevStreak&&S.streak>=2)toast(`${S.streak}-day streak — keep the shift going`);
   x.done.state='final';save()}
 
-document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open]');if(!el)return;
+document.addEventListener('click',e=>{const el=e.target.closest('button,[data-open],[data-act]');if(!el)return;
   if(el.dataset.station){goStation(el.dataset.station);return}
   if(el.dataset.open){cur=el.dataset.open;w(cur).rstep='triage';setAppView('work');mview='work';render();return}
   if(el.dataset.mview){goMview(el.dataset.mview);return}
   const t=find(cur),x=t&&w(t.id);
   const act=el.dataset.act||el.id;
   if(act==='desk-queue'){goStation('queue');return}
-  if(act==='kb'&&el.dataset.kb){kbOpen=el.dataset.kb;setAppView('docs');renderDesk();renderRail();return}
+  if(act==='kb'&&el.dataset.kb){kbOpen=el.dataset.kb;cur=null;setAppView('docs');render();return}
   if(act==='kb-back'){kbOpen=null;renderDesk();return}
-  if(act==='mod'){const mod=MODULES.find(m=>m.id===el.dataset.mod);const area=mod?mod.area:el.dataset.mod;
+  if(act==='chat-focus'){chatFocus=el.dataset.chat;deskChatQ='';renderDesk();renderRail();return}
+  if(act==='chat-bump'){const id=el.dataset.chat;const c=CHATS.find(x=>x.id===id);const st=ensureDeskChat(id);if(!c||!st)return;
+    st.msgs.push({r:'cl',t:pick(['Any update on this?','Still broken my side.','Can you look today?','Ping — clients asking again.'])});
+    if(chatFocus!==id)st.unread=(st.unread||0)+1;save();toast('Inbound from '+c.who.split(' ')[0]);renderDesk();renderRail();return}
+  if(act==='chat-ticket'){const c=CHATS.find(x=>x.id===el.dataset.chat);if(!c)return;ensureDeskChat(c.id);
+    let hit=S.queue.find(q=>q.seed===c.seed||(q.area===c.area&&!(W[q.id]&&W[q.id].done)));
+    if(!hit){const seed=bankById(c.seed);hit=seed?prepTicket(seed):mintTicket(c.area);
+      hit.id='ch'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);hit.seed=c.seed||hit.seed;hit.channel='chat';S.queue.unshift(hit)}
+    cur=hit.id;w(cur).rstep='triage';save();toast('Ticket from chat');setAppView('work');mview='work';render();return}
+  if(act==='mail-focus'){mailFocus=el.dataset.mail;renderDesk();return}
+  if(act==='mail-ticket'){const tr=MAIL_TRACES.find(m=>m.id===el.dataset.mail);if(!tr)return;
+    if(!S.mailSeen.includes(tr.id))S.mailSeen.push(tr.id);
+    let hit=S.queue.find(q=>q.seed===tr.seed||(q.area===tr.area&&!(W[q.id]&&W[q.id].done)));
+    if(!hit){const seed=bankById(tr.seed);hit=seed?prepTicket(seed):mintTicket(tr.area);
+      hit.id='mt'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);hit.seed=tr.seed||hit.seed;S.queue.unshift(hit)}
+    cur=hit.id;w(cur).rstep='triage';save();toast('Opened from mail trace');setAppView('work');mview='work';render();return}
+  if(act==='host'){const map={php:'PHP-FPM restarted on pool www',cache:'Object cache flushed (Redis)',scan:'Malware scan finished · clean'};
+    const line=`${new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · ${map[el.dataset.host]||'Action queued'}`;
+    S.hostLog=(S.hostLog||[]).concat([line]).slice(-20);save();toast(map[el.dataset.host]||'Done');renderDesk();return}
+  if(act==='vm-open'){const vm=VM.find(v=>v.id===el.dataset.vm);if(!vm)return;
+    if(!S.vm.includes(vm.id))S.vm.push(vm.id);
+    let hit=S.queue.find(q=>q.seed===vm.seed||(q.area===vm.area&&!(W[q.id]&&W[q.id].done)));
+    if(!hit){const seed=bankById(vm.seed);hit=seed?prepTicket(seed):mintTicket(vm.area);
+      hit.id='vm'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);hit.seed=vm.seed||hit.seed;hit.channel=hit.channel||'call';S.queue.unshift(hit)}
+    cur=hit.id;w(cur).rstep='triage';save();toast('Opened from voicemail');setAppView('work');mview='work';render();return}
+  if(act==='pin'&&t&&x){const tab=el.dataset.conn;const i=+el.dataset.li;
+    const lines=String((t.ev&&t.ev[tab])||'').split('\n').map(s=>s.trim()).filter(Boolean);const line=lines[i];
+    if(!line||x.done)return;if(!Array.isArray(x.findings))x.findings=[];
+    if(x.findings.some(f=>f.tab===tab&&f.line===line)){toast('Already pinned');return}
+    if(x.findings.length>=8){toast('Max 8 findings');return}
+    x.findings.push({tab,line});toast('Finding pinned');renderWork();return}
+  if(act==='unpin'&&t&&x){const i=+el.dataset.i;if(!Array.isArray(x.findings)||i<0)return;x.findings.splice(i,1);renderWork();return}
+  if(act==='askchip'&&t&&x){if(x.done)return;const q=el.dataset.q||'';if(!q)return;
+    if(x.chat.filter(m=>m.r==='me').length>=5){toast('Question limit reached');return}
+    ensureChat(t,x);x.chat.push({r:'me',t:q});x.chat.push({r:'cl',t:scriptReply(t,q)});x.q='';renderWork();return}
+  if(act==='mod'){const mid=el.dataset.mod;const mod=MODULES.find(m=>m.id===mid);const area=mod?mod.area:mid;
+    if(mod){S.mods[mod.id]=1;save()}
     const hit=S.queue.find(q=>q.area===area)||null;
     if(hit){cur=hit.id;w(cur).rstep='triage';setAppView('work');mview='work';toast('Practise: '+area);render();return}
     const minted=mintTicket(area);S.queue.unshift(minted);cur=minted.id;w(cur).rstep='triage';setAppView('work');mview='work';save();toast('Fresh drill: '+area);render();return}
@@ -857,9 +1049,15 @@ document.addEventListener('click',e=>{const el=e.target.closest('button,[data-op
 });
 document.addEventListener('change',e=>{const n=e.target.name,v=e.target.value;
   const t=find(cur);if(!t)return;const x=w(t.id);
-  if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v});
-document.addEventListener('input',e=>{const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value;if(e.target.id==='teamq')x.teamq=e.target.value});
+  if(n==='key'||n==='dx'||n==='fix')x[n]=+v;else if(n==='pri'||n==='bill')x[n]=v;
+  const prog=$('#tri-prog');if(prog)prog.innerHTML=`<b>${triageDone(x)}</b> of 5 triage answers locked in`});
+document.addEventListener('input',e=>{
+  if(e.target.id==='deskchatq'){deskChatQ=e.target.value;return}
+  const t=find(cur);if(!t)return;const x=w(t.id);if(e.target.id==='reply')x.reply=e.target.value;if(e.target.id==='chatq')x.q=e.target.value;if(e.target.id==='teamq')x.teamq=e.target.value});
 document.addEventListener('submit',e=>{
+  if(e.target.id==='deskchatf'){e.preventDefault();const c=CHATS.find(x=>x.id===chatFocus);const st=ensureDeskChat(chatFocus);if(!c||!st)return;
+    const q=(deskChatQ||'').trim();if(!q)return;st.msgs.push({r:'me',t:q});deskChatQ='';
+    st.msgs.push({r:'cl',t:deskChatReply(c,q)});save();renderDesk();renderRail();return}
   if(e.target.id==='teamf'){e.preventDefault();const t=find(cur);if(!t)return;const x=w(t.id);ensureTeam(x);
     const q=(x.teamq||'').trim();if(!q||x.done||(x.escalations||0)>=2)return;
     x.team.push({r:'me',t:q});x.teamq='';
@@ -874,7 +1072,9 @@ document.addEventListener('submit',e=>{
   if(e.target.id!=='chatf')return;e.preventDefault();const t=find(cur);if(!t)return;const x=w(t.id);
   const q=(x.q||'').trim();if(!q||x.done)return;if(x.chat.filter(m=>m.r==='me').length>=5)return;
   x.chat.push({r:'me',t:q});x.q='';x.chat.push({r:'cl',t:scriptReply(t,q)});renderWork()});
-const tick=setInterval(()=>{const t=find(cur);if(!t||!W[t.id]||W[t.id].done)return;const s=fmtT(Date.now()-W[t.id].start);
+const tick=setInterval(()=>{
+  const sc=$('#shift-clock');if(sc)sc.textContent=shiftClock();
+  const t=find(cur);if(!t||!W[t.id]||W[t.id].done)return;const s=fmtT(Date.now()-W[t.id].start);
   document.querySelectorAll('#timer,#timer-m').forEach(el=>{el.textContent=s})},1000);
 matchMedia('(max-width:760px)').addEventListener('change',()=>render());
 
